@@ -131,7 +131,7 @@ export default {
       if(!upadress || upadress==undefined) {
         this.$message.error(this.$tc('home.Pleasepurchasethroughtheinvitationlink'));
         upadress = '0x0000000000000000000000000000000000000000'; // 设置一个默认值
-        return; // 如果需要通过邀请链接才能购买，把这个注释打开
+        // return; // 如果需要通过邀请链接才能购买，把这个注释打开
       }
       const loading = this.$loading({
         lock: true,

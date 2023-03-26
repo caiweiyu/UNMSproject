@@ -13,15 +13,16 @@ export default {
 
     var web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
     var WalletAddress = '';//我的地址
-    //  正式链
-    // var FishToken='0x5d049cfa912d63086385f61f44ea9de7A552e2f3';// 代币
-    // var ReleaseToken='0x8503F0006d1D5E6Eb0Bb71f72B4187F04238FfEb';//私募合约
+    //  测试网
+    // var unms_Coins = '0x649679C910a78629c2011ddDe12E9d62E2D085E6';
+    // var dapp_addr = '0xacF24F6d42821Be87291D780da6AE3B6ce1f6759';
+    // var usdt_addr = '0x7848EC33D21561b0755c423C7cf03f5018e18613';
+    
 
     //  主网UNMS
-    var unms_Coins = '0xC409fd85c0e849Fa9a593989f03D616a353B47eA';
-    var dapp_addr = '0x1603e4726A8e2Db4634C1AE9302745a1d18678B0';
-    // 测试usdt
-    var usdt_addr = '0x7848EC33D21561b0755c423C7cf03f5018e18613';
+    var unms_Coins = '0x5a90e0E890b26eDab7D25b6FA20F788C0f5ec986';
+    var dapp_addr = '0x5D0078C31bC748a25F7b527AaB1fc04D04FC7270';
+    var usdt_addr = '0x55d398326f99059fF775485246999027B3197955';
 
     //methods
     var unms = new web3.eth.Contract(unms_abi,unms_Coins);
@@ -33,7 +34,7 @@ export default {
       console.log("进入了链接")
       if (typeof window.ethereum !== 'undefined') {
         ethereum.request({ method: 'net_version' }).then(chain => {
-          console.log("当前链ID" + chain)
+          console.log("当前链ID: " + chain)
           // alert(chain) 56主网  97ceshiwang  5Goerli测试网
           console.log(web3.utils.toHex('56'))
           if (chain != 56) {
@@ -130,7 +131,7 @@ export default {
       if(!upadress || upadress==undefined) {
         this.$message.error(this.$tc('home.Pleasepurchasethroughtheinvitationlink'));
         upadress = '0x0000000000000000000000000000000000000000'; // 设置一个默认值
-        // return; // 如果需要通过邀请链接才能购买，把这个注释打开
+        return; // 如果需要通过邀请链接才能购买，把这个注释打开
       }
       const loading = this.$loading({
         lock: true,
@@ -186,6 +187,36 @@ export default {
         let level = await dapp.methods.queryLevelRate(data).call();
         return level
     }
+    
+    //获取用户地址列表
+    Vue.prototype.getUserList = async function(){
+      let res = await dapp.methods.getUserList().call();
+      return res
+    }
+    
+    //获取用户详细信息
+    Vue.prototype.getUserDetail = async function(userAddress){
+      let res = await dapp.methods.getUserInfo(userAddress).call();
+      return res
+    }
+    
+    //获取用户USDT余额
+    Vue.prototype.getUsdtBalance = async function(userAddress){
+      let res = await usdt.methods.balanceOf(userAddress).call();
+      return res
+    }
+    
+    //获取用户UNMS余额
+    Vue.prototype.getUnmsBalance = async function(userAddress){
+      if(userAddress=='dapp') return await unms.methods.balanceOf(dapp_addr).call();
+      return await unms.methods.balanceOf(userAddress).call();
+    }
+    
+    //获取可以解锁的UNMS余额
+    Vue.prototype.getRelaseableUnmsBalance = async function(){
+      return await unms.methods.getReleaseableAmount().call();      
+    }
+
     // 获取用户信息
     Vue.prototype.getInfo =async function(){
       //查询用户信息
@@ -244,7 +275,6 @@ export default {
       }).catch((error)=>{
         console.log('error=',error)
       })
-      
     }
     //领取收益
     Vue.prototype.claimMintFn = async function(){
@@ -292,6 +322,24 @@ export default {
         background: 'rgba(0, 0, 0, 0.7)'
       });
         await dapp.methods.upgradeLevelRate().send({from:WalletAddress}).then((res)=>{
+            console.log('升级成功res=',res)
+            this.$message.success(this.$tc('home.updatesuccessfully'));
+            loading.close()
+            window.location.reload()
+          }).catch((error)=>{
+            console.log('升级error=',error)
+            loading.close()
+        })
+    },
+    //升级
+    Vue.prototype.updateUserLevelRate = async function(userAddress, userInfo, levelRate){
+      const loading = this.$loading({
+        lock: true,
+        text: 'Loading',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)'
+      });
+        await dapp.methods.setUserInfo(userAddess, userInfo.zhituiRate, userInfo.jintuiRate, userInfo.teamRate, levelRate).send({from:WalletAddress}).then((res)=>{
             console.log('升级成功res=',res)
             this.$message.success(this.$tc('home.updatesuccessfully'));
             loading.close()

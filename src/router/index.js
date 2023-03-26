@@ -60,6 +60,14 @@ const routes = [
     component: () => import("@/views/transductive"),
   },
   {
+    path: "/backman",
+    name:"backman",
+    meta: {
+      title: "直推列表",
+    },
+    component: () => import("@/views/backman"),
+  },
+  {
     path: "/invite",
     name:"invite",
     meta: {

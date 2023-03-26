@@ -1,0 +1,28 @@
+/* 全局样式 */
+html {
+  overflow-y: scroll;
+}
+
+:root {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+:root body {
+  position: absolute;
+}
+
+body {
+  width: 100vw;
+  overflow: hidden;
+}
+* {
+  font-family: Microsoft YaHei;
+}
+button {
+  background: none;
+  border: none;
+}
+img {
+  display: block;
+}

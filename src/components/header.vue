@@ -12,6 +12,7 @@
             <div class="title">{{ title }}</div>
             <div class="right" @click="hanlder"></div>
         </div>
+        <div class="fix_bg" v-if="active" @click="closeFn"></div>
     </div>
 </template>
 
@@ -44,6 +45,10 @@ export default {
         }
     },
     methods:{
+        //关闭
+        closeFn(){
+            this.active = false;
+        },
         refuse(){
             this.$router.push({ path: "/" });
         },
@@ -122,7 +127,16 @@ export default {
     height: pxttrem(1036) !important;
     // overflow: none !important;
     // overflow: auto !important;
-    z-index: 1;
+    z-index: 999;
+  }
+  .fix_bg{
+    background: transparent;
+    height: 100vh;
+    width: 100vw;
+    position: fixed;
+    // display: none;
+    top: 0;
+    z-index: 0;
   }
   .export{
     transition: all .3s ease-in;

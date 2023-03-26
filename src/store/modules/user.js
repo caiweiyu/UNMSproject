@@ -37,6 +37,8 @@ const user = {
             content:""
         },
         teamMemberCount:0,
+        getTodayLimitAmount:0,//今日可销售量
+        daySoldAmount:0//当天已销售量
     },
     mutations:{
         committeamMemberCount: (state, teamMemberCount) => {
@@ -119,7 +121,14 @@ const user = {
         },
         committip:(state,tip)=>{
             state.tip = tip;
-        }
+        },
+        commitgetTodayLimitAmount:(state,getTodayLimitAmount)=>{
+            state.getTodayLimitAmount = getTodayLimitAmount;
+        },
+        commitdaySoldAmount:(state,daySoldAmount)=>{
+            state.daySoldAmount = daySoldAmount;
+        },
+
     },
     actions:{
 

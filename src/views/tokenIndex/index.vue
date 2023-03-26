@@ -15,6 +15,8 @@
                 <li :class="[index != 1 ? 'expande1-li' : '']" @click="changeLanguage(index)" v-for="(item,index) in lang" :key="index">{{ item }}</li>
             </ul>
         </div>
+        <!--关闭层-->
+        <div class="fix_bg" v-if="active1 || active" @click="closeFn"></div>
         <!--头部-->
         <div class="home">
             <div class="home-top">
@@ -142,6 +144,11 @@ export default {
     mounted(){
     },
     methods:{
+        //关闭
+        closeFn(){
+            this.active = false;
+            this.active1 = false;
+        },
         //会员等级
         getNum(data){
             let result = null;
@@ -249,11 +256,20 @@ export default {
     height: pxttrem(1036) !important;
     // overflow: none !important;
     // overflow: auto !important;
-    z-index: 1;
+    z-index: 999;
   }
   .active1{
     height: pxttrem(236) !important;
-    z-index: 1;
+    z-index: 999;
+  }
+  .fix_bg{
+    background: transparent;
+    min-height: 100vh;
+    width: 100vw;
+    position: fixed;
+    // display: none;
+    top: 0;
+    z-index: 0;
   }
   .export1{
     transition: all .3s ease-in;

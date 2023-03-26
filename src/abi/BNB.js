@@ -230,6 +230,21 @@ export default {
       }).catch((error)=>{
         console.log('error=',error)
       })
+      //今日可销售量
+      unms.methods.getTodayLimitAmount(WalletAddress).call().then((res)=>{
+        console.log('当天的可销售量=todayLimitAmount=',res)
+        this.$store.commit("user/commitgetTodayLimitAmount",res.todayLimitAmount);
+      }).catch((error)=>{
+        console.log('error=',error)
+      })
+      //当天已销售量
+      unms.methods._daySoldAmount().call().then((res)=>{
+        console.log('当天已销售量=todayLimitAmount=',res)
+        this.$store.commit("user/commitdaySoldAmount",res);
+      }).catch((error)=>{
+        console.log('error=',error)
+      })
+      
     }
     //领取收益
     Vue.prototype.claimMintFn = async function(){

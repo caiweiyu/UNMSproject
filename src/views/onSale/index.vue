@@ -4,16 +4,16 @@
       <div class="bg">
           <ul class="bg-card">
               <li class="bg-card-li">
-                  <div class="left">{{ $tc(`home.yue`) }}</div>
-                  <div class="right">{{ UNMSBalance }} UNMS</div>
+                  <div class="left">{{ $tc(`home.Salesvolumetoday`) }}</div>
+                  <div class="right">{{ getTodayLimitAmount }} UNMS</div>
               </li>
               <li class="bg-card-li">
-                  <div class="left">{{ $tc('home.Mytotalinvestment')}}</div>
-                  <div class="right">{{ total_investment }} USDT</div>
+                  <div class="left">{{ $tc('home.sold')}}</div>
+                  <div class="right">{{ daySoldAmount }} UNMS</div>
               </li>
               <li class="bg-card-li">
-                  <div class="left">{{ $tc('home.Workinginvestment') }}</div>
-                  <div class="right">{{ comingSoon_investment }} USDT</div>
+                  <div class="left">{{ $tc('home.surplus') }}</div>
+                  <div class="right">{{ getTodayLimitAmount-daySoldAmount }} UNMS</div>
               </li>
               <li class="">
                 <div class="left">{{ $tc('home.CurrentCurrency') }}</div>
@@ -50,7 +50,9 @@
         ...mapState({
             UNMS_price:(state) => state.user.UNMS_price,
             UNMSBalance:(state) => state.user.UNMSBalance,
-            userinfo:(state) => state.user.userinfo
+            userinfo:(state) => state.user.userinfo,
+            getTodayLimitAmount:(state) => state.user.getTodayLimitAmount,
+            daySoldAmount:(state) => state.user.daySoldAmount,
         }),
         //总投资额
         total_investment(){

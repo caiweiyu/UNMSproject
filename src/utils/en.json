@@ -66,6 +66,9 @@
     "Investmentsuccess":"Investment success",
     "Receivesuccessfully":"Receive successfully",
     "updatesuccessfully":"update successfully",
-    "replicatedData":"replicated data"
+    "replicatedData":"replicated data",
+    "Salesvolumetoday":"Sales volume today",
+    "sold":"sold",
+    "surplus":"surplus"
   }
 }

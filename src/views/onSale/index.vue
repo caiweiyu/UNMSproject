@@ -5,15 +5,15 @@
           <ul class="bg-card">
               <li class="bg-card-li">
                   <div class="left">{{ $tc(`home.Salesvolumetoday`) }}</div>
-                  <div class="right">{{ getTodayLimitAmount }} UNMS</div>
+                  <div class="right">{{ (getTodayLimitAmount/1e18).toFixed(2) }} UNMS</div>
               </li>
               <li class="bg-card-li">
                   <div class="left">{{ $tc('home.sold')}}</div>
-                  <div class="right">{{ daySoldAmount }} UNMS</div>
+                  <div class="right">{{ (daySoldAmount/1e18).toFixed(2) }} UNMS</div>
               </li>
               <li class="bg-card-li">
                   <div class="left">{{ $tc('home.surplus') }}</div>
-                  <div class="right">{{ getTodayLimitAmount-daySoldAmount }} UNMS</div>
+                  <div class="right">{{ ((getTodayLimitAmount-daySoldAmount)/1e18).toFixed(2) }} UNMS</div>
               </li>
               <li class="">
                 <div class="left">{{ $tc('home.CurrentCurrency') }}</div>

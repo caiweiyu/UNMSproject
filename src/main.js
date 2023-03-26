@@ -71,7 +71,6 @@ Vue.prototype.GetUrlParam = function(paraName) { //获取ref参数值
 　　　　　　return "";
 　　　　}
 　　},
-
 //获取本地选择的语言
 new Vue({
   router,

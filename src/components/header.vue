@@ -60,12 +60,6 @@ export default {
                     status:true,
                     content:this.$tc('home.development')
                 });
-                setTimeout(()=>{
-                    this.$store.commit('user/committip',{
-                        status:false,
-                        content:this.$tc('home.development')
-                    });
-                },1000);
                 return
             }
             // this.$router.push({ path: data });

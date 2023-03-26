@@ -183,12 +183,6 @@ export default {
                     status:true,
                     content:this.$tc('home.Cantbuyagain')
                 });
-                setTimeout(()=>{
-                    this.$store.commit('user/committip',{
-                        status:false,
-                        content:this.$tc('home.Cantbuyagain')
-                    });
-                },1000)
                 return;
             }
             this.getDapp(data)
@@ -201,12 +195,6 @@ export default {
                     status:true,
                     content:this.$tc('home.development')
                 });
-                setTimeout(()=>{
-                    this.$store.commit('user/committip',{
-                        status:false,
-                        content:this.$tc('home.development')
-                    });
-                },1000)
                 return
             }
             let ref=this.GetUrlParam('ref')

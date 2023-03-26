@@ -18,6 +18,18 @@ export default {
       ...mapState({
         tip:(state) => state.user.tip
       })
+    },
+    watch:{
+        tip(newval,oldval){
+            if(newval.status){
+                setTimeout(()=>{
+                    this.$store.commit('user/committip',{
+                        status:false,
+                        content:""
+                    });
+                },1000)
+            }
+        }
     }
 }
 </script>

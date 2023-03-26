@@ -1,4 +1,4 @@
-
+import store from "../../store/index";
 const copy = {
     bind(el, {
       value
@@ -28,7 +28,11 @@ const copy = {
         const result = document.execCommand('Copy')
   
         if (result) {
-          console.log('复制成功:', textarea.value) // 可根据项目UI仔细设计
+          store.commit('user/committip',{
+              status:true,
+              content:localStorage.getItem('lang')=="zh_CN" ? "已复制" :"copy success"
+          });
+          console.log('复制成功=', textarea.value) // 可根据项目UI仔细设计
         }
         document.body.removeChild(textarea)
       }

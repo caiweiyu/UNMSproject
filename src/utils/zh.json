@@ -65,7 +65,8 @@
     "Cancelbeingtraded":"取消被交易",
     "Investmentsuccess":"投入成功",
     "Receivesuccessfully":"领取成功",
-    "updatesuccessfully":"升级成功"
+    "updatesuccessfully":"升级成功",
+    "replicatedData":"已复制"
 
   }
 }

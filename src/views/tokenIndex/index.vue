@@ -256,11 +256,11 @@ export default {
     height: pxttrem(1036) !important;
     // overflow: none !important;
     // overflow: auto !important;
-    z-index: 999;
+    z-index: 999 !important;
   }
   .active1{
     height: pxttrem(236) !important;
-    z-index: 999;
+    z-index: 999 !important;
   }
   .fix_bg{
     background: transparent;
@@ -269,7 +269,7 @@ export default {
     position: fixed;
     // display: none;
     top: 0;
-    z-index: 0;
+    z-index: 2;
   }
   .export1{
     transition: all .3s ease-in;

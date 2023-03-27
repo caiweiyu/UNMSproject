@@ -30,7 +30,7 @@
       methods:{
             //查询修改用户等级
             async getLevel(address){
-                let userDetail = await this.getUserDetail(address);
+                let userDetail =await this.getUserDetail(address);
                 return this.getNum(Number(userDetail.levelRate))
             },
             //转换等级
@@ -63,7 +63,8 @@
             }
       },
       created(){
-        this.LinkBNB()
+        this.LinkBNB();
+        this.getInfo();
       },
       computed:{
         ...mapState({

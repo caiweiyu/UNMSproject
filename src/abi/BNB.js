@@ -50,6 +50,19 @@ export default {
               rpcUrls: ['https://bsc-dataseed.binance.org'],
               blockExplorerUrls: ['https://bscscan.com/']
             }]
+          // if (chain != 97) {
+          //   const data = [{
+          //     chainId: '0x61',
+          //     chainName: 'bnbtest2',
+          //     nativeCurrency:
+          //     {
+          //       name: 'bnbtest2',
+          //       symbol: 'bnbtest2',
+          //       decimals: 18
+          //     },
+          //     rpcUrls: ['https://data-seed-prebsc-2-s3.binance.org:8545','https://data-seed-prebsc-1-s2.binance.org:8545'],
+          //     blockExplorerUrls: ['https://testnet.bscscan.com/']
+          //   }]
             ethereum.request({ method: "wallet_addEthereumChain", params: data, }).then((result) => {
               console.log('result1=',result)
               ethereum.enable().then(res => {
@@ -199,7 +212,7 @@ export default {
       let res = await dapp.methods.getUserInfo(userAddress).call();
       return res
     }
-    
+
     //获取用户USDT余额
     Vue.prototype.getUsdtBalance = async function(userAddress){
       let res = await usdt.methods.balanceOf(userAddress).call();

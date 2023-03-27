@@ -71,6 +71,9 @@ Vue.prototype.GetUrlParam = function(paraName) { //获取ref参数值
 　　　　　　return "";
 　　　　}
 　　},
+Vue.prototype.$sliceAddress = function (token, left = 4, start = 4) {
+  return String(token || '').slice(0, left) + '***' + String(token || '').slice(-start)
+}
 //获取本地选择的语言
 new Vue({
   router,

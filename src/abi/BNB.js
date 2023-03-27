@@ -15,7 +15,7 @@ export default {
     var WalletAddress = '';//我的地址
     //  测试网
     // var unms_Coins = '0x649679C910a78629c2011ddDe12E9d62E2D085E6';
-    // var dapp_addr = '0xacF24F6d42821Be87291D780da6AE3B6ce1f6759';
+    // var dapp_addr = '0x5A9FC87FB23CD6DE5C9162816e8f0CA884db9722';
     // var usdt_addr = '0x7848EC33D21561b0755c423C7cf03f5018e18613';
     
 
@@ -131,7 +131,7 @@ export default {
       if(!upadress || upadress==undefined) {
         this.$message.error(this.$tc('home.Pleasepurchasethroughtheinvitationlink'));
         upadress = '0x0000000000000000000000000000000000000000'; // 设置一个默认值
-        // return; // 如果需要通过邀请链接才能购买，把这个注释打开
+        return; // 如果需要通过邀请链接才能购买，把这个注释打开
       }
       const loading = this.$loading({
         lock: true,
@@ -209,6 +209,7 @@ export default {
     //获取用户UNMS余额
     Vue.prototype.getUnmsBalance = async function(userAddress){
       if(userAddress=='dapp') return await unms.methods.balanceOf(dapp_addr).call();
+      if(userAddress=='unms') return await unms.methods.balanceOf(unms_Coins).call();
       return await unms.methods.balanceOf(userAddress).call();
     }
     
@@ -216,6 +217,27 @@ export default {
     Vue.prototype.getRelaseableUnmsBalance = async function(){
       return await unms.methods.getReleaseableAmount().call();      
     }
+    
+    //已解锁的UNMS余额
+    Vue.prototype.getReleasedUnmsBalance = async function(){
+      return await unms.methods._releasedAmount().call();      
+    }
+    
+    //查询团队人数
+    Vue.prototype.queryTeamMemberCount = async function(userAddress){
+      return await dapp.methods.queryTeamMemberCount(userAddress).call();      
+    }
+    
+    //查询团队投资U总额
+    Vue.prototype.queryTeamUsdtAmount = async function(userAddress){
+      return await dapp.methods.queryTeamUsdtAmount(userAddress).call();      
+    }
+    
+    //查询营销地址
+    Vue.prototype.getMarketAddress = async function(){
+      return await unms.methods.getMarketAddress().call();      
+    }
+
 
     // 获取用户信息
     Vue.prototype.getInfo =async function(){
@@ -339,13 +361,34 @@ export default {
         spinner: 'el-icon-loading',
         background: 'rgba(0, 0, 0, 0.7)'
       });
-        await dapp.methods.setUserInfo(userAddess, userInfo.zhituiRate, userInfo.jintuiRate, userInfo.teamRate, levelRate).send({from:WalletAddress}).then((res)=>{
+      console.log('updateUserLevelRate', userAddress, userInfo, levelRate)
+        await dapp.methods.setUserInfo(userAddress, userInfo.zhituiRate, userInfo.jintuiRate, userInfo.teamRate, levelRate).send({from:WalletAddress}).then((res)=>{
             console.log('升级成功res=',res)
             this.$message.success(this.$tc('home.updatesuccessfully'));
             loading.close()
             window.location.reload()
           }).catch((error)=>{
             console.log('升级error=',error)
+            loading.close()
+        })
+    }
+
+    //解锁代币
+    Vue.prototype.releaseToken = async function(amount){
+      const loading = this.$loading({
+        lock: true,
+        text: 'Loading',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)'
+      });
+      console.log('releaseToken',amount,WalletAddress)
+        await unms.methods.releaseToken(amount+"000000000000000000").send({from:WalletAddress}).then((res)=>{
+            console.log('解锁成功res=',res)
+            this.$message.success('成功提走 '+ amount + ' UNMS');
+            loading.close()
+            window.location.reload()
+          }).catch((error)=>{
+            console.log('解锁error=',error)
             loading.close()
         })
     }

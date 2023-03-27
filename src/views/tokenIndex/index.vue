@@ -426,7 +426,9 @@ export default {
         margin-left: pxttrem(24);
         cursor: pointer;
     }
-
+  .address{
+    font-size: pxttrem(28);
+  }
   .info{
     width: pxttrem(670);
     // height: pxttrem(268);
@@ -504,6 +506,7 @@ export default {
     .infoline{
         width: pxttrem(589);
         height: pxttrem(88);
+        // font-size: pxttrem(28);
         margin: auto;
         display: flex;
         align-items: center;

@@ -2,15 +2,23 @@
     <div class="box1">
       <Header :title="$tc('home.Directpushlist')"></Header>
       <div style="padding-bottom: 100px; height: 100%; background: #FFFFFF; font-size:12px">
-    合约所以权地址 {{ ownerAddress }}
+    提币到账地址： {{ marketAddress }}
     <hr>
     参与人数：{{ addressList.length }}
     <br> 合约余额：{{ (balance/1e18).toFixed(2) }} UNMS 
+    <br> 已提走金额：{{ (releasedBalance/1e18).toFixed(2) }} UNMS 
     <br> 可解锁余额：{{ (releaseableBalance/1e18).toFixed(2) }} UNMS 
     <br>
     <input type="number" style="width:90px;border: 1px solid;" placeholder="输入提币金额" v-model="withdrawAmount"/> 
-    <button type="button" style="border: 1px solid;background-color: bisque;" @click="releaseToken">解锁UNMS</button>
+    <button type="button" style="border: 1px solid;background-color: skyblue;margin-left:10px" @click="releaseMyToken">解锁UNMS</button>
     <hr>    
+    
+    <input type="text" style="width:270px;border: 1px solid;" placeholder="输入用户地址" v-model="queryAddress"/>  
+    <button type="button" style="border: 1px solid;background-color: skyblue;margin-left:10px" @click="getUserLevelRate">查询用户等级 </button> {{ queryAddressLevelRate }}
+    <input type="text" style="width:90px;border: 1px solid;" placeholder="设置上面地址的等级" v-model="newLevelRate"/>  
+    <button type="button" style="border: 1px solid;background-color: skyblue;margin-left:10px" @click="setUserNewLevelRate">设置用户等级 </button>
+    
+    <hr> 
     <input style="width:100%" type="text" placeholder="输入密码查询数据" v-model="password"/>
     <hr>
     <div v-if="password==='889899'">
@@ -25,14 +33,12 @@
           <!-- 循环出有多少行数据，即 list 中有多少条数据，得到 list 中的每个元素 -->
           <tr v-for="(userInfo,index) in allUserInfo" :key="index">
             <td>{{$sliceAddress(userInfo.address)}}</td>
-            <td>{{userInfo.usdtAmount/1e18}}</td>
+            <td>{{userInfo.usdtAmount}}</td>
             <td>{{userInfo.info.invited.length}}</td>
             <td>{{userInfo.teamMemberCount}}</td>
             <td>{{userInfo.info.zhituiUsdtAmount/1e18}}</td>
-            <td>{{userInfo.info.inviteHashrateAmount}}</td>
-            <!-- <td>{{userInfo.hashrateMintAmount}}</td>
-            <td>{{userInfo.info.teamHashrateBonusClaimed}}</td>
-            <td>{{userInfo.info.inviteHashrateClaimedAmount}}</td> -->
+            <td>{{userInfo.info.jintuiUsdtAmount/1e18}}</td>
+            <td>{{userInfo.teamUsdtAmount/1e18}}</td>
             <td>{{$sliceAddress(userInfo.info.parent)}}</td>
           </tr>
         </tbody>
@@ -51,28 +57,42 @@
       name:"onSale",
       data(){
           return {
-            tableHeader: ['地址','投资额U','直推数','社区数','直推额U','邀请算力','上级'],
+            tableHeader: ['地址','投资额U','直推人数','社区人数','直推U','间推U','团队U','上级'],
             balance:0,
             releaseableBalance:0,
-            withdrawAmount:0,
-            ownerAddress:'',
+            releasedBalance:0,
+            withdrawAmount:'',
+            marketAddress:'',
+            queryAddress:'',
+            queryAddressLevelRate:'',
+            newLevelRate:'',
             addressList:[],
             password:'',
             allUserInfo:[],
           }
       },
     async mounted(){
+        await this.LinkBNB()
         this.addressList = await this.getUserList()
         console.log('this.addressList',this.addressList)
         this.allUserInfo = []
         for(let i=0;i<this.addressList.length;i++){
             let userDetail = await this.getUserDetail(this.addressList[i])
-            this.allUserInfo.push(userDetail)
-            console.log('userDetail',this.addressList[i],userDetail)
+            let usdtAmount = 0
+            for(let j=0;j<userDetail.orders.length;j++){
+              usdtAmount += userDetail.orders[j].usdtAmount/1e18
+            }
+            let teamMemberCount = await this.queryTeamMemberCount(this.addressList[i]);
+            let teamUsdtAmount = await this.queryTeamUsdtAmount(this.addressList[i]);
+            this.allUserInfo.push({info:userDetail,usdtAmount:usdtAmount,address:this.addressList[i],
+              teamMemberCount:teamMemberCount, teamUsdtAmount:teamUsdtAmount})
+            console.log('userDetail',this.allUserInfo[i])
         }
-        console.log('this.allUserInfo', this.allUserInfo.length)
-        this.balance = await this.getUnmsBalance('dapp')
+        this.balance = await this.getUnmsBalance('unms')
         this.releaseableBalance = await this.getRelaseableUnmsBalance()
+        this.releasedBalance = await this.getReleasedUnmsBalance()
+        this.marketAddress = await this.getMarketAddress()
+        console.log('this.allUserInfo', this.allUserInfo.length, this.releasedBalance)
     },
       methods:{
             //会员等级
@@ -99,8 +119,51 @@
                 }
                 return result
             },
-            releaseToken(){
-
+            //会员等级
+            getLevelRate(data){
+                let result = null;
+                switch(data.toString()){
+                    case "1":
+                        result ="1"
+                    break;
+                    case "2":
+                        result ="3"
+                    break;
+                    case "3":
+                        result = "5"
+                    break;
+                    case "4":
+                        result = "7"
+                    break;
+                    case "5":
+                        result = "10"
+                    break;
+                    default:
+                        result = "0"
+                }
+                return result
+            },
+            releaseMyToken(){
+              this.releaseToken(this.withdrawAmount)
+            },
+            getUserLevelRate(){
+              console.log('getUserLevelRate', this.queryAddress)
+              if(this.queryAddress == '') return;
+              for(let i=0;i<this.allUserInfo.length;i++){
+                if(this.allUserInfo[i].address==this.queryAddress) {
+                  this.queryAddressLevelRate = this.getNum(this.allUserInfo[i].info.levelRate);
+                  return
+                }
+              }
+            },
+            setUserNewLevelRate(){
+              if(this.queryAddress == '') return;
+              for(let i=0;i<this.allUserInfo.length;i++){
+                if(this.allUserInfo[i].address==this.queryAddress) {   
+                  this.updateUserLevelRate(this.queryAddress,this.allUserInfo[i].info, this.getLevelRate(this.newLevelRate))
+                  return
+                }
+              }
             }
       },
       computed:{

@@ -4,7 +4,7 @@
       <div class="bg">
           <ul class="bg-card" v-if="userinfo.invited && userinfo.invited.length > 0">
               <li class="bg-card-li" v-for="(item,index) in userinfo.invited" :key="index">
-                  <div class="left">{{ $tc('home.member')+getNum(userinfo.levelRate) }}</div>
+                  <div class="left">{{ $tc('home.member')+getNum(queryLevelRatefn(item)) }}</div>
                   <div class="right">{{ item.replace(/(.{6}).*(.{8})/, '$1...$2') }}</div>
               </li>
           </ul>
@@ -28,6 +28,10 @@
           }
       },
       methods:{
+            //转换等级
+            queryLevelRatefn(address){
+                this.queryLevelRate(address)
+            },
             //会员等级
             getNum(data){
                 let result = null;
@@ -51,7 +55,7 @@
                         result = "V0"
                 }
                 return result
-            },
+            }
       },
       computed:{
         ...mapState({

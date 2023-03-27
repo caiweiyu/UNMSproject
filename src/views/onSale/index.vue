@@ -43,6 +43,9 @@
       methods:{
   
       },
+      created(){
+        this.LinkBNB()
+      },
       components:{
           Header 
       },

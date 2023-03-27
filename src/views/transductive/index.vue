@@ -4,7 +4,7 @@
       <div class="bg">
           <ul class="bg-card" v-if="userinfo.invited && userinfo.invited.length > 0">
               <li class="bg-card-li" v-for="(item,index) in userinfo.invited" :key="index">
-                  <div class="left">{{ $tc('home.member')+getNum(queryLevelRatefn(item)) }}</div>
+                  <div class="left">{{ $tc('home.member')+getNum(Number(queryLevelRatefn(item))) }}</div>
                   <div class="right">{{ item.replace(/(.{6}).*(.{8})/, '$1...$2') }}</div>
               </li>
           </ul>

@@ -2,10 +2,10 @@
     <div class="box1">
       <Header :title="$tc('home.Directpushlist')"></Header>
       <div class="bg">
-          <ul class="bg-card" v-if="userinfo.invited && userinfo.invited.length > 0">
-              <li class="bg-card-li" v-for="(item,index) in userinfo.invited" :key="index">
-                  <div class="left">{{ $tc('home.member')+getLevel(item) }}</div>
-                  <div class="right">{{ item.replace(/(.{6}).*(.{8})/, '$1...$2') }}</div>
+          <ul class="bg-card" v-if="invitedUserList.length > 0">
+              <li class="bg-card-li" v-for="(item,index) in invitedUserList" :key="index">
+                  <div class="left">{{ $tc('home.member')+item.level }}</div>
+                  <div class="right">{{ item.address.replace(/(.{6}).*(.{8})/, '$1...$2') }}</div>
               </li>
           </ul>
           <ul class="bg-card" v-else>
@@ -24,19 +24,10 @@
       name:"onSale",
       data(){
           return {
-              
+              invitedUserList:[]
           }
       },
       methods:{
-            //查询修改用户等级
-            async getLevel(address){
-                let userDetail =await this.getUserDetail(address);
-                return this.getNum(Number(userDetail.levelRate))
-            },
-            //转换等级
-            queryLevelRatefn(address){
-                this.queryLevelRate(address)
-            },
             //会员等级
             getNum(data){
                 let result = null;
@@ -62,14 +53,21 @@
                 return result
             }
       },
-      created(){
+      async created(){
         this.LinkBNB();
-        this.getInfo();
+        let userList = []
+        let me = await this.getUserDetail(this.address);
+        for(let i=0;i<me.invited.length;i++){
+            let userDetail = await this.getUserDetail(me.invited[i]);
+            userList.push({address: me.invited[i], level: this.getNum(Number(userDetail.levelRate))})
+        }
+        this.invitedUserList = userList;
+      },
+      async mounted(){
       },
       computed:{
         ...mapState({
             address:(state) => state.user.address,
-            userinfo:(state) => state.user.userinfo,
         })
       },
       components:{

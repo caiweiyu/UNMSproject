@@ -2,7 +2,7 @@
     <div class="box1">
       <Header :title="$tc('home.Directpushlist')"></Header>
       <div style="padding-bottom: 100px; height: 100%; background: #FFFFFF; font-size:12px">
-    提币到账地址： {{ marketAddress }}
+    提币到账地址： {{ releaseAddress }}
     <hr>
     参与人数：{{ addressList.length }}
     <br> 合约余额：{{ (balance/1e18).toFixed(2) }} UNMS 
@@ -33,6 +33,7 @@
           <!-- 循环出有多少行数据，即 list 中有多少条数据，得到 list 中的每个元素 -->
           <tr v-for="(userInfo,index) in allUserInfo" :key="index">
             <td>{{$sliceAddress(userInfo.address)}}</td>
+            <td>{{getNum(userInfo.info.levelRate)}}</td>
             <td>{{userInfo.usdtAmount}}</td>
             <td>{{userInfo.info.invited.length}}</td>
             <td>{{userInfo.teamMemberCount}}</td>
@@ -57,12 +58,12 @@
       name:"onSale",
       data(){
           return {
-            tableHeader: ['地址','投资额U','直推人数','社区人数','直推U','间推U','团队U','上级'],
+            tableHeader: ['地址','等级','投资额U','直推人数','社区人数','直推U','间推U','团队U','上级'],
             balance:0,
             releaseableBalance:0,
             releasedBalance:0,
             withdrawAmount:'',
-            marketAddress:'',
+            releaseAddress:'',
             queryAddress:'',
             queryAddressLevelRate:'',
             newLevelRate:'',
@@ -73,6 +74,10 @@
       },
     async mounted(){
         await this.LinkBNB()
+        this.balance = await this.getUnmsBalance('unms')
+        this.releaseableBalance = await this.getRelaseableUnmsBalance()
+        this.releasedBalance = await this.getReleasedUnmsBalance()
+        this.releaseAddress = await this.getReleaseAddress()
         this.addressList = await this.getUserList()
         console.log('this.addressList',this.addressList)
         this.allUserInfo = []
@@ -88,10 +93,6 @@
               teamMemberCount:teamMemberCount, teamUsdtAmount:teamUsdtAmount})
             console.log('userDetail',this.allUserInfo[i])
         }
-        this.balance = await this.getUnmsBalance('unms')
-        this.releaseableBalance = await this.getRelaseableUnmsBalance()
-        this.releasedBalance = await this.getReleasedUnmsBalance()
-        this.marketAddress = await this.getMarketAddress()
         console.log('this.allUserInfo', this.allUserInfo.length, this.releasedBalance)
     },
       methods:{
@@ -146,24 +147,16 @@
             releaseMyToken(){
               this.releaseToken(this.withdrawAmount)
             },
-            getUserLevelRate(){
+            async getUserLevelRate(){
               console.log('getUserLevelRate', this.queryAddress)
               if(this.queryAddress == '') return;
-              for(let i=0;i<this.allUserInfo.length;i++){
-                if(this.allUserInfo[i].address==this.queryAddress) {
-                  this.queryAddressLevelRate = this.getNum(this.allUserInfo[i].info.levelRate);
-                  return
-                }
-              }
+              let userDetail = await this.getUserDetail(this.queryAddress)
+              this.queryAddressLevelRate = this.getNum(userDetail.levelRate);
             },
-            setUserNewLevelRate(){
-              if(this.queryAddress == '') return;
-              for(let i=0;i<this.allUserInfo.length;i++){
-                if(this.allUserInfo[i].address==this.queryAddress) {   
-                  this.updateUserLevelRate(this.queryAddress,this.allUserInfo[i].info, this.getLevelRate(this.newLevelRate))
-                  return
-                }
-              }
+            async setUserNewLevelRate(){
+              if(this.queryAddress == '') return;              
+              let userDetail = await this.getUserDetail(this.queryAddress)
+              this.updateUserLevelRate(this.queryAddress, userDetail, this.getLevelRate(this.newLevelRate))
             }
       },
       computed:{

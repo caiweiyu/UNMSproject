@@ -250,7 +250,11 @@ export default {
     Vue.prototype.getMarketAddress = async function(){
       return await unms.methods.getMarketAddress().call();      
     }
-
+    
+    //查询提币地址
+    Vue.prototype.getReleaseAddress = async function(){
+      return await unms.methods.getReleaseAddress().call();      
+    }
 
     // 获取用户信息
     Vue.prototype.getInfo =async function(){

@@ -74,15 +74,15 @@ const routes = [
       title: "我的邀请",
     },
     component: () => import("@/views/invite"),
-  }
-  //
-  // {
-  //   path: "/tokenIndexNext",
-  //   meta: {
-  //     title: "详情",
-  //   },
-  //   component: () => import("@/views/tokenIndexNext"),
-  // },
+  },
+  {
+    path: "/swap",
+    name:"swapToken",
+    meta: {
+      title: "买卖币",
+    },
+    component: () => import("@/views/swap"),
+  },
   // {
   //   path: "/tokenIndexEnd",
   //   meta: {

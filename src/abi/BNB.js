@@ -5,6 +5,7 @@ import Vue from 'vue';
 import unms_abi from '@/abi/Unms.json'
 import Dapp_abi from '@/abi/Dapp.json'
 import Usdt_abi from '@/abi/Usdt.json'
+import Router_abi from '@/abi/Router.json'
 
 import { Toast } from 'vant';
 Vue.use(Toast);
@@ -14,20 +15,25 @@ export default {
     var web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
     var WalletAddress = '';//我的地址
     //  测试网
-    // var unms_Coins = '0x649679C910a78629c2011ddDe12E9d62E2D085E6';
-    // var dapp_addr = '0x5A9FC87FB23CD6DE5C9162816e8f0CA884db9722';
+    // var unms_Coins = '0x7A6Ee6F445bEd9461E9975638bE4A36B529D3a1e';
+    // var dapp_addr = '0x3BCD6e8A1bAdCBCA8aa58e84Ce156fBc78eB8562';
+    // var pair_addr = '0x22aB4d8CbD0125a266d4E3BE835926B4b3161Ad7';
     // var usdt_addr = '0x7848EC33D21561b0755c423C7cf03f5018e18613';
+    // var router_addr = '0x444506226E57834a7d98998394587f2894947801';
     
 
-    //  主网UNMS
+    // //  主网UNMS
     var unms_Coins = '0x5a90e0E890b26eDab7D25b6FA20F788C0f5ec986';
     var dapp_addr = '0x5D0078C31bC748a25F7b527AaB1fc04D04FC7270';
+    var pair_addr = '0x5aA263EB67847643E5Cf5Ad2a28359170aDcF9c8';
     var usdt_addr = '0x55d398326f99059fF775485246999027B3197955';
+    var router_addr = '0x10ED43C718714eb63d5aA57B78B54704E256024E';
 
     //methods
     var unms = new web3.eth.Contract(unms_abi,unms_Coins);
     var dapp = new web3.eth.Contract(Dapp_abi,dapp_addr);
     var usdt = new web3.eth.Contract(Usdt_abi,usdt_addr);
+    var router = new web3.eth.Contract(Router_abi,router_addr);
 
     // 链接钱包
     Vue.prototype.LinkBNB = function (e) {
@@ -121,12 +127,6 @@ export default {
       }).catch((error)=>{
         console.log('error=',error)
       })
-      unms.methods.getReleaseableAmount().call().then((res)=>{
-        var param = (res/Math.pow(10,18)).toString();
-        console.log('查某个地址今天可以买的数量，还顺便返回当天限购总量=',param)
-      }).catch((error)=>{
-        console.log('error=',error)
-      })
       //unms余额
       unms.methods.balanceOf(WalletAddress).call().then((res)=>{
         console.log('数量===',res)
@@ -144,7 +144,7 @@ export default {
       if(!upadress || upadress==undefined) {
         this.$message.error(this.$tc('home.Pleasepurchasethroughtheinvitationlink'));
         upadress = '0x0000000000000000000000000000000000000000'; // 设置一个默认值
-        return; // 如果需要通过邀请链接才能购买，把这个注释打开
+        // return; // 如果需要通过邀请链接才能购买，把这个注释打开
       }
       const loading = this.$loading({
         lock: true,
@@ -176,7 +176,7 @@ export default {
         return;
       }
 
-      const txDetail = await dapp.methods.invest(param,upadress)
+      const txDetail = await dapp.methods.unmsInputU(param,upadress)
         .send({ from : WalletAddress })
         .catch((error) => {
             loading.close()
@@ -202,8 +202,8 @@ export default {
     }
     
     //获取用户地址列表
-    Vue.prototype.getUserList = async function(){
-      let res = await dapp.methods.getUserList().call();
+    Vue.prototype.getUserList = async function(offset, pageSize){
+      let res = await dapp.methods.getUserList(offset, pageSize).call();
       return res
     }
     
@@ -215,14 +215,17 @@ export default {
 
     //获取用户USDT余额
     Vue.prototype.getUsdtBalance = async function(userAddress){
-      let res = await usdt.methods.balanceOf(userAddress).call();
-      return res
+      if(userAddress=='dapp') return await usdt.methods.balanceOf(dapp_addr).call();
+      if(userAddress=='unms') return await usdt.methods.balanceOf(unms_Coins).call();
+      if(userAddress=='pair') return await usdt.methods.balanceOf(pair_addr).call();
+      return await usdt.methods.balanceOf(userAddress).call();
     }
     
     //获取用户UNMS余额
     Vue.prototype.getUnmsBalance = async function(userAddress){
       if(userAddress=='dapp') return await unms.methods.balanceOf(dapp_addr).call();
       if(userAddress=='unms') return await unms.methods.balanceOf(unms_Coins).call();
+      if(userAddress=='pair') return await unms.methods.balanceOf(pair_addr).call();
       return await unms.methods.balanceOf(userAddress).call();
     }
     
@@ -266,25 +269,17 @@ export default {
         console.log('error=',error)
       })
       //查询已产出的收益
-      dapp.methods.queryMintToken(WalletAddress).call().then((res)=>{
+      dapp.methods.unmsQueryMintToken(WalletAddress).call().then((res)=>{
         this.$store.commit("user/commitGenerate",res);
         console.log('产出收益=',res)
       }).catch((error)=>{
         console.log('error=',error)
       })
-      //查询所有的投资用户地址列表
-      dapp.methods.getUserList().call().then((res)=>{
-        // this.$store.commit("user/commitGenerate",res);
-        // console.log('查询所有的投资用户地址列表=',res)
-      }).catch((error)=>{
-        console.log('error=',error)
-      })
-      //查询当前币价
-      dapp.methods.getNowPrice().call().then((res)=>{
-        console.log('查询当前币价=',res);
-        this.$store.commit("user/commitUNMS_price",(res/Math.pow(10,18)).toFixed(6));
-      }).catch((error)=>{
-        console.log('error=',error)
+      dapp.methods._dayPrice((new Date().getTime()/86400000).toFixed(0)).call().then((res)=>{
+          console.log('今日价格=',res/1e18);
+          this.$store.commit("user/commitUNMS_price",(res/Math.pow(10,18)).toFixed(6));
+        }).catch((error)=>{
+          console.log('今日价格error=',error)
       })
       //查询团队投入的U
       dapp.methods.queryTeamUsdtAmount(WalletAddress).call().then((res)=>{
@@ -323,7 +318,7 @@ export default {
         spinner: 'el-icon-loading',
         background: 'rgba(0, 0, 0, 0.7)'
       });
-        await dapp.methods.claimMintToken().send({from:WalletAddress}).then((res)=>{
+        await dapp.methods.unmsClaimMintToken().send({from:WalletAddress}).then((res)=>{
             console.log('领取res=',res)
             this.$message.success(this.$tc('home.Receivesuccessfully'));
             loading.close()
@@ -341,7 +336,7 @@ export default {
           spinner: 'el-icon-loading',
           background: 'rgba(0, 0, 0, 0.7)'
         });
-          await dapp.methods.claimInviteBonus().send({from:WalletAddress}).then((res)=>{
+          await dapp.methods.unmsClaimInviteBonus().send({from:WalletAddress}).then((res)=>{
               console.log('领取成功res=',res)
               this.$message.success("领取成功");
               loading.close()
@@ -379,7 +374,7 @@ export default {
         background: 'rgba(0, 0, 0, 0.7)'
       });
       console.log('updateUserLevelRate', userAddress, userInfo, levelRate)
-        await dapp.methods.setUserInfo(userAddress, userInfo.zhituiRate, userInfo.jintuiRate, userInfo.teamRate, levelRate).send({from:WalletAddress}).then((res)=>{
+        await dapp.methods.setUnmsUserInfo(userAddress, userInfo.zhituiRate, userInfo.jintuiRate, userInfo.teamRate, levelRate).send({from:WalletAddress}).then((res)=>{
             console.log('升级成功res=',res)
             this.$message.success(this.$tc('home.updatesuccessfully'));
             loading.close()
@@ -389,23 +384,91 @@ export default {
             loading.close()
         })
     }
-
-    //解锁代币
-    Vue.prototype.releaseToken = async function(amount){
+    
+    // 换币
+    Vue.prototype.swapToken = async function(amountIn, isBuy){
+      let path=[usdt_addr,unms_Coins];
+      if(!isBuy) path=[unms_Coins, usdt_addr];
       const loading = this.$loading({
         lock: true,
         text: 'Loading',
         spinner: 'el-icon-loading',
         background: 'rgba(0, 0, 0, 0.7)'
       });
-      console.log('releaseToken',amount,WalletAddress)
-        await unms.methods.releaseToken(amount+"000000000000000000").send({from:WalletAddress}).then((res)=>{
-            console.log('解锁成功res=',res)
-            this.$message.success('成功提走 '+ amount + ' UNMS');
+      if(isBuy){
+        let allowanceUsdtAmount = Number(await usdt.methods.allowance(WalletAddress, router_addr).call())/1e18;
+        console.log('allowanceUsdtAmount', allowanceUsdtAmount);
+        if(allowanceUsdtAmount<amountIn){
+          // 授权的额度不足，需要再授权
+          const txDetail = await usdt.methods.approve(router_addr, (amountIn*1e18).toString())
+            .send({from:WalletAddress})
+            .catch((error) => {
+                loading.close();
+                console.log("call usdt.approve() error", error);
+                if(error.message == "Invalid parameters: must provide an Ethereum address."){
+                  this.$message.error(this.$tc('home.Whethertoconnecttotheactiveaddress'));
+                }else{
+                  this.$message.error(this.$tc('home.Cancellationofauthorization'));
+                }
+            });
+          loading.close();
+          console.log("usdt.methods.approve txDetail",txDetail);
+          if(undefined != txDetail && txDetail.status == true){
+            this.$message.success(this.$tc('home.AuthorizationSucceeds'));
+          }  
+          return;
+        }
+      }else{
+        let allowanceUnmsAmount = Number(await unms.methods.allowance(WalletAddress, router_addr).call())/1e18;
+        console.log('allowanceUnmsAmount', allowanceUnmsAmount);
+        if(allowanceUnmsAmount<amountIn){
+          // 授权的额度不足，需要再授权
+          const txDetail = await unms.methods.approve(router_addr, (amountIn*1e18).toString())
+            .send({from:WalletAddress})
+            .catch((error) => {
+                loading.close();
+                console.log("call unms.approve() error", error);
+                if(error.message == "Invalid parameters: must provide an Ethereum address."){
+                  this.$message.error(this.$tc('home.Whethertoconnecttotheactiveaddress'));
+                }else{
+                  this.$message.error(this.$tc('home.Cancellationofauthorization'));
+                }
+            });
+          loading.close();
+          console.log("unms.methods.approve txDetail",txDetail);
+          if(undefined != txDetail && txDetail.status == true){
+            this.$message.success(this.$tc('home.AuthorizationSucceeds'));
+          }  
+          return;
+        }
+      }
+      console.log('swapToken', amountIn, path)
+      await router.methods.swapExactTokensForTokensSupportingFeeOnTransferTokens((amountIn*1e18).toString(), 0, path, WalletAddress, '9999999999999').send({from:WalletAddress}).then((res)=>{
+            console.log('swapToken成功res=',res)
+            this.$message.success(this.$tc('home.successfully'));
             loading.close()
             window.location.reload()
           }).catch((error)=>{
-            console.log('解锁error=',error)
+            console.log('swapToken error=',error)
+            loading.close()
+        })
+    }
+    // 设置价格
+    Vue.prototype.setTodayPrice = async function(price){
+      const loading = this.$loading({
+        lock: true,
+        text: 'Loading',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)'
+      });
+      console.log('setTodayPrice',price)
+        await dapp.methods.setPrice(price).send({from:WalletAddress}).then((res)=>{
+            console.log('setTodayPrice成功res=',res)
+            this.$message.success(this.$tc('home.successfully'));
+            loading.close()
+            window.location.reload()
+          }).catch((error)=>{
+            console.log('setTodayPrice error=',error)
             loading.close()
         })
     }

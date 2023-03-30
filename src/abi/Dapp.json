@@ -24,6 +24,25 @@
 		"type": "event"
 	},
 	{
+		"inputs": [
+			{
+				"internalType": "uint32",
+				"name": "",
+				"type": "uint32"
+			}
+		],
+		"name": "_dayPrice",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
 		"inputs": [],
 		"name": "_priceTime",
 		"outputs": [
@@ -38,16 +57,15 @@
 	},
 	{
 		"inputs": [],
-		"name": "claimInviteBonus",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "claimMintToken",
-		"outputs": [],
-		"stateMutability": "nonpayable",
+		"name": "_tokenDistributor",
+		"outputs": [
+			{
+				"internalType": "contract TokenDistributor",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
 		"type": "function"
 	},
 	{
@@ -78,38 +96,25 @@
 	},
 	{
 		"inputs": [],
-		"name": "getMyTokenContractAddress",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "getNowPrice",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
 		"name": "getTotalInvestAmount",
 		"outputs": [
 			{
 				"internalType": "uint256",
 				"name": "",
 				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getUnmsTokenContractAddress",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
 			}
 		],
 		"stateMutability": "view",
@@ -210,6 +215,11 @@
 								"type": "uint32"
 							},
 							{
+								"internalType": "uint32",
+								"name": "claimDayCount",
+								"type": "uint32"
+							},
+							{
 								"internalType": "uint256",
 								"name": "usdtAmount",
 								"type": "uint256"
@@ -234,7 +244,18 @@
 		"type": "function"
 	},
 	{
-		"inputs": [],
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "offset",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "pageSize",
+				"type": "uint256"
+			}
+		],
 		"name": "getUserList",
 		"outputs": [
 			{
@@ -271,30 +292,6 @@
 		"type": "function"
 	},
 	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "usdtAmount",
-				"type": "uint256"
-			},
-			{
-				"internalType": "address",
-				"name": "parent",
-				"type": "address"
-			}
-		],
-		"name": "invest",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "success",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
 		"inputs": [],
 		"name": "owner",
 		"outputs": [
@@ -321,35 +318,6 @@
 				"internalType": "uint8",
 				"name": "",
 				"type": "uint8"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "userAddress",
-				"type": "address"
-			}
-		],
-		"name": "queryMintToken",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "mintToken",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "avaliableAmount",
-				"type": "uint256"
-			},
-			{
-				"internalType": "bool",
-				"name": "orderExpire",
-				"type": "bool"
 			}
 		],
 		"stateMutability": "view",
@@ -395,31 +363,6 @@
 	},
 	{
 		"inputs": [],
-		"name": "releaseBalance",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "token",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "amount",
-				"type": "uint256"
-			}
-		],
-		"name": "releaseToken",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
 		"name": "renounceOwnership",
 		"outputs": [],
 		"stateMutability": "nonpayable",
@@ -441,12 +384,25 @@
 	{
 		"inputs": [
 			{
+				"internalType": "uint256",
+				"name": "price",
+				"type": "uint256"
+			}
+		],
+		"name": "setPrice",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
 				"internalType": "address",
 				"name": "contractAddress",
 				"type": "address"
 			}
 		],
-		"name": "setMyTokenContractAddress",
+		"name": "setUnmsTokenContractAddress",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -479,113 +435,7 @@
 				"type": "uint8"
 			}
 		],
-		"name": "setUserInfo",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "testSetUpdatePrice",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "userAddress",
-				"type": "address"
-			},
-			{
-				"internalType": "uint8",
-				"name": "zhituiRate",
-				"type": "uint8"
-			},
-			{
-				"internalType": "uint8",
-				"name": "jintuiRate",
-				"type": "uint8"
-			},
-			{
-				"internalType": "uint8",
-				"name": "teamRate",
-				"type": "uint8"
-			},
-			{
-				"internalType": "uint8",
-				"name": "levelRate",
-				"type": "uint8"
-			},
-			{
-				"internalType": "uint256",
-				"name": "inviteBonusAmount",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "claimedInviteBonusAmount",
-				"type": "uint256"
-			}
-		],
-		"name": "testSetUserInfo",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "userAddress",
-				"type": "address"
-			},
-			{
-				"internalType": "address[]",
-				"name": "invited",
-				"type": "address[]"
-			}
-		],
-		"name": "testSetUserInvited",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "userAddress",
-				"type": "address"
-			},
-			{
-				"internalType": "uint8",
-				"name": "orderIndex",
-				"type": "uint8"
-			},
-			{
-				"internalType": "bool",
-				"name": "isClear",
-				"type": "bool"
-			},
-			{
-				"internalType": "uint32",
-				"name": "investTime",
-				"type": "uint32"
-			},
-			{
-				"internalType": "uint256",
-				"name": "usdtAmount",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "claimedAmount",
-				"type": "uint256"
-			}
-		],
-		"name": "testSetUserOrder",
+		"name": "setUnmsUserInfo",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -599,6 +449,103 @@
 			}
 		],
 		"name": "transferOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "unmsClaimInviteBonus",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "unmsClaimMintToken",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "usdtAmount",
+				"type": "uint256"
+			},
+			{
+				"internalType": "address",
+				"name": "parent",
+				"type": "address"
+			}
+		],
+		"name": "unmsInputU",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "success",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "userAddress",
+				"type": "address"
+			}
+		],
+		"name": "unmsQueryMintToken",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "mintToken",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "avaliableAmount",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint32",
+				"name": "dayCount",
+				"type": "uint32"
+			},
+			{
+				"internalType": "bool",
+				"name": "orderExpire",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "unmsReleaseBalance",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "token",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			}
+		],
+		"name": "unmsReleaseToken",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"

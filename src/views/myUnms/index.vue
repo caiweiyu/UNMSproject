@@ -83,7 +83,7 @@
             </div>
             <li class="bg-card-bold">
                   <div class="div left">
-                    <div class="top1">{{ comingSoon_investment*0.02/UNMS_price | fixedValue }} UNMS</div>
+                    <div class="top1">{{ comingSoon_investment | fixedValue }} UNMS</div>
                     <div class="top2">{{ $tc('home.OutputToday') }}</div>
                   </div>
                   <div class="div right">
@@ -119,20 +119,26 @@
             active:false
           }
       },
-      created(){
+      async created(){
           this.LinkBNB();
       },
       filters: {
           fixedValue(value){
-            // console.log('fixedValue', value)
-              if(value == undefined || value == 0) return value
+              if(value == undefined || value == 0) {
+                console.log('fixedValue', value, value)
+                return value
+              }
               else{
                 value = value.toString().toLowerCase()
-                 if(value.length>=18 ||  // 数长度大于18
+                 if(value.split('.')[0].length>=18 ||  // 数长度大于18
                   (value.indexOf('e+')>0 && parseInt(value.split('e+')[1])>=18)){  // 数大于1e18
+                  console.log('fixedValue', value, (value/1e18).toFixed(2))
                   return (value/1e18).toFixed(2)
                  }
-                 else return (value/1).toFixed(2)
+                 else {
+                  console.log('fixedValue', value, (value/1).toFixed(2))
+                  return (value/1).toFixed(2)
+                 }
               }
           },
       },
@@ -197,7 +203,7 @@
           if(this.userinfo.orders && this.userinfo.orders.length > 0){
             let num = 0;
             for(let i= 0;i< this.userinfo.orders.length;i++){
-              num +=this.userinfo.orders[i]['2']/Math.pow(10,18)
+              num +=this.userinfo.orders[i].usdtAmount/Math.pow(10,18)
             };
             console.log('总投资额=',Number(num).toFixed(2))
             return Number(num).toFixed(2)
@@ -207,10 +213,12 @@
         },
         //正在投资
         comingSoon_investment(){
-            if(this.userinfo.orders && this.userinfo.orders.length > 0){
+          console.log('comingSoon_investment',this.userinfo.orders, this.UNMS_price)
+            if(this.userinfo && this.userinfo.orders && this.userinfo.orders.length > 0){
                 let num = this.userinfo.orders[this.userinfo.orders.length-1].usdtAmount/1e18
-                console.log('投资中=',num)
-                return num
+                if(this.UNMS_price==0) return 0
+                console.log('投资中=',num, this.UNMS_price,num*0.02/this.UNMS_price)
+                return num*0.02/this.UNMS_price
             }else{
                 return 0
             }
@@ -234,7 +242,7 @@
                 let res = null;
                 for(let i= 0;i< this.userinfo.orders.length;i++){
                     if(i == this.userinfo.orders.length-1){
-                        res = new Date().getTime() - this.userinfo.orders[i]['investTime']*1000;
+                        res = new Date().getTime() - this.userinfo.orders[i].investTime*1000;
                     }
                 };
                 console.log('已经工作天数=',res)
@@ -251,7 +259,7 @@
       components:{
           Header 
       },
-      mounted(){
+      async mounted(){
         console.log('this.generate=',this.generate)
       }
   }

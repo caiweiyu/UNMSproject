@@ -48,8 +48,8 @@
       },
       async mounted(){
         // 池子地址0x49F35a6A1e7770B98C69f6BA36F150c0f1a1A2dF
-        let usdtBalance = await this.getUsdtBalance('0x49F35a6A1e7770B98C69f6BA36F150c0f1a1A2dF')
-        let unmsBalance = await this.getUnmsBalance('0x49F35a6A1e7770B98C69f6BA36F150c0f1a1A2dF')
+        let usdtBalance = await this.getUsdtBalance('pair')
+        let unmsBalance = await this.getUnmsBalance('pair')
         this.unmsPrice = (usdtBalance/unmsBalance).toFixed(7)
       },    
       components:{

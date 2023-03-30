@@ -2,7 +2,7 @@
     <div class="box1">
       <Header :title="$tc('home.Swap')"></Header>
       <div class="bg">
-          <div class="bg-card">
+          <div class="bg-card" v-if="isBuy">
                 <div class="title">
                     转出
                 </div>
@@ -11,14 +11,13 @@
                         <div class="usdt"></div>
                         <div class="usdt_f">USDT</div>
                     </div>
-                    <input class="input_r" v-model="usdt_val" />
+                    <input class="input_r" v-model="input1Value" />
                 </div>
                 <div class="tip">
-                    <div class="tip_left">余额：98,688,986.000 US</div>
-                    <div class="tip_right">$688,986.000</div>
+                    <div class="tip_left">余额：{{ usdtBalance|fixedValue }} USDT</div>
                 </div>
                 <div class="line">
-                    <div class="img"></div>
+                    <div class="img" @click="isBuy=false"></div>
                 </div>
                 <div class="title1">
                     获得
@@ -28,15 +27,55 @@
                         <div class="usdt1"></div>
                         <div class="usdt_f">UNMS</div>
                     </div>
-                    <input class="input_r" v-model="usdt_val2" />
+                    <div class="input_r" style="color:white">{{ input1Value*exchangeUsdt2Unms/1e18 }}</div>
                 </div>
                 <div class="tip">
-                    <div class="tip_left">余额：98,688,986.000 US</div>
+                    <div class="tip_left">余额：{{ unmsBalance/1e18|fixedValue }} UNMS</div>
+                    <div class="tip_right">${{ unmsBalance*exchangeUnms2Usdt/1e18 |fixedValue  }}</div>
                     <div class="tip_right"></div>
                 </div>
-                <div class="tip2">汇率：1 USDT ≈ 489,445.</div>
+                <div class="tip2">USDT汇率：1 USDT ≈ {{ exchangeUsdt2Unms|fixedValue }} UNMS</div>
+                <div class="tip2" style="margin-top: 8px">UNMS汇率：1 UNMS ≈ {{ exchangeUnms2Usdt.toFixed(5) }} USDT</div>
                 <div class="tip3">手续费：7%</div>
-                <div class="btn">立即兑换</div>
+                <div class="btn" @click="swapUsdt2Unms">立即兑换</div>
+          </div>
+
+          <div class="bg-card" v-else>
+                <div class="title">
+                    转出
+                </div>
+                <div class="input">
+                    <div class="input_f">
+                        <div class="usdt1"></div>
+                        <div class="usdt_f">UNMS</div>
+                    </div>
+                    <input class="input_r" v-model="input1Value" />
+                </div>
+                <div class="tip">
+                    <div class="tip_left">余额：{{ unmsBalance/1e18|fixedValue }} UNMS</div>
+                    <div class="tip_right">${{ unmsBalance*exchangeUnms2Usdt/1e18 |fixedValue  }}</div>
+                </div>
+                <div class="line">
+                    <div :class="['img2']" @click="isBuy=true"></div>
+                </div>
+                <div class="title1">
+                    获得
+                </div>
+                <div class="input">
+                    <div class="input_f">
+                        <div class="usdt"></div>
+                        <div class="usdt_f">USDT</div>
+                    </div>
+                    <div class="input_r" style="color:white">{{ (input1Value*exchangeUnms2Usdt).toFixed(8) }}</div>
+                </div>
+                <div class="tip">
+                    <div class="tip_left">余额：{{ usdtBalance/1e18|fixedValue }} USDT</div>
+                    <div class="tip_right"></div>
+                </div>
+                <div class="tip2">USDT汇率：1 USDT ≈ {{ exchangeUsdt2Unms|fixedValue }} UNMS</div>
+                <div class="tip2" style="margin-top: 8px">UNMS汇率：1 UNMS ≈ {{ exchangeUnms2Usdt.toFixed(5) }} USDT</div>
+                <div class="tip3">手续费：7%</div>
+                <div class="btn" @click="swapUsdt2Unms">立即兑换</div>
           </div>
       </div>
     </div>
@@ -49,48 +88,56 @@
       name:"swap",
       data(){
           return {
-            usdt_val:'998.00',
-            usdt_val2:'1998.00',
+            input1Value:'',
+            input2Value:'',
+            exchangeUsdt2Unms:0,
+            exchangeUnms2Usdt:0,
+            usdtBalance:0,
+            unmsBalance:0,
+            isBuy:true
+
           }
       },
+
+      filters: {
+          fixedValue(value){
+              if(value == undefined || value == 0) {
+                console.log('fixedValue', value, value)
+                return value
+              }
+              else{
+                value = value.toString().toLowerCase()
+                 if(value.split('.')[0].length>=18 ||  // 数长度大于18
+                  (value.indexOf('e+')>0 && parseInt(value.split('e+')[1])>=18)){  // 数大于1e18
+                  console.log('fixedValue', value, (value/1e18).toFixed(6))
+                  return (value/1e18).toFixed(6)
+                 }
+                 else {
+                  console.log('fixedValue', value, (value/1).toFixed(6))
+                  return (value/1).toFixed(6)
+                 }
+              }
+          },
+      },
       methods:{
-            //查询修改用户等级
-            async getLevel(address){
-                let userDetail =await this.getUserDetail(address);
-                return this.getNum(Number(userDetail.levelRate))
+            // 查询价格
+            async getUnmsPrice(){
+                this.usdtBalance = await this.getUsdtBalance(this.address)
+                this.unmsBalance = await this.getUnmsBalance(this.address)
+                let pairUsdtBalance = await this.getUsdtBalance('pair')
+                let pairUnmsBalance = await this.getUnmsBalance('pair')
+                this.exchangeUsdt2Unms = pairUnmsBalance*1e18/pairUsdtBalance
+                this.exchangeUnms2Usdt = pairUsdtBalance/pairUnmsBalance
+                console.log('pair usdtBalance', pairUsdtBalance)
+                console.log('pair unmsBalance', pairUnmsBalance)
             },
-            //转换等级
-            queryLevelRatefn(address){
-                this.queryLevelRate(address)
-            },
-            //会员等级
-            getNum(data){
-                let result = null;
-                switch(data.toString()){
-                    case "1":
-                        result ="V1"
-                    break;
-                    case "3":
-                        result ="V2"
-                    break;
-                    case "5":
-                        result = "V3"
-                    break;
-                    case "7":
-                        result = "V4"
-                    break;
-                    case "10":
-                        result = "V5"
-                    break;
-                    default:
-                        result = "V0"
-                }
-                return result
+            async swapUsdt2Unms(){
+                this.swapToken(this.input1Value/1,this.isBuy)
             }
       },
-      created(){
+      async created(){
         this.LinkBNB();
-        this.getInfo();
+        await this.getUnmsPrice()
       },
       computed:{
         ...mapState({
@@ -121,7 +168,7 @@
               padding-bottom: pxttrem(20);
               &-card{
                 width: pxttrem(670);
-                min-height: pxttrem(976);
+                min-height: pxttrem(1076);
                 background: #322267;
                 border-radius: pxttrem(16);
                 margin: pxttrem(40) auto 0;
@@ -155,6 +202,16 @@
                         left: 50%;
                         top: 50%;
                         transform: translate(-50%,-50%);
+                    }
+                    .img2{
+                        position: absolute;
+                        width: pxttrem(66);
+                        height: pxttrem(64);
+                        background: url("../../assets/images/xxx.png")no-repeat center;
+                        background-size: 100% 100%;
+                        left: 50%;
+                        top: 50%;
+                        transform: translate(-50%,-50%) rotate(180deg);
                     }
                 }
                 .input{
@@ -231,7 +288,7 @@
                     color: #FFFFFF;
                 }
                 .btn{
-                    margin: pxttrem(20) auto;
+                    margin: pxttrem(40) auto;
                     width: pxttrem(590);
                     height: pxttrem(96);
                     line-height: pxttrem(96);

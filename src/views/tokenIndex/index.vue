@@ -111,7 +111,7 @@ export default {
                 {name:this.$tc(`home.myInvitation`),router:"invite"},
                 {name:this.$tc(`home.OneclickCoin`),router:""},
                 {name:this.$tc(`home.Tools`),router:""},
-                {name:this.$tc(`home.Swap`),router:""},
+                {name:this.$tc(`home.Swap`),router:"swap"},
                 {name:this.$tc(`home.DAO`),router:""},
             ],
             msg:""

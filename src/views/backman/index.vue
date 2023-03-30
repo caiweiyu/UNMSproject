@@ -6,11 +6,11 @@
     <hr>
     参与人数：{{ addressList.length }}
     <br> 合约余额：{{ (balance/1e18).toFixed(2) }} UNMS 
-    <br> 已提走金额：{{ (releasedBalance/1e18).toFixed(2) }} UNMS 
-    <br> 可解锁余额：{{ (releaseableBalance/1e18).toFixed(2) }} UNMS 
+    <br> 已提走金额：{{ (releasedBalance).toFixed(2) }} UNMS 
+    <br> 今日池子参考价格：{{ unmsPrice }}
     <br>
-    <input type="number" style="width:90px;border: 1px solid;" placeholder="输入提币金额" v-model="withdrawAmount"/> 
-    <button type="button" style="border: 1px solid;background-color: skyblue;margin-left:10px" @click="releaseMyToken">解锁UNMS</button>
+    <input type="number" style="width:90px;border: 1px solid;" placeholder="输入今日价格" v-model="todayPrice"/> 
+    <button type="button" style="border: 1px solid;background-color: skyblue;margin-left:10px" @click="setPrice">设置价格</button>
     <hr>    
     
     <input type="text" style="width:270px;border: 1px solid;" placeholder="输入用户地址" v-model="queryAddress"/>  
@@ -62,7 +62,8 @@
             balance:0,
             releaseableBalance:0,
             releasedBalance:0,
-            withdrawAmount:'',
+            unmsPrice:0,
+            todayPrice:'',
             releaseAddress:'',
             queryAddress:'',
             queryAddressLevelRate:'',
@@ -75,25 +76,34 @@
     async mounted(){
         await this.LinkBNB()
         this.balance = await this.getUnmsBalance('unms')
-        this.releaseableBalance = await this.getRelaseableUnmsBalance()
-        this.releasedBalance = await this.getReleasedUnmsBalance()
+        this.releasedBalance = 50000000-this.balance/1e18;
         this.releaseAddress = await this.getReleaseAddress()
-        this.addressList = await this.getUserList()
-        console.log('this.addressList',this.addressList)
+        let tmpAddressList = await this.getUserList(0,10)
+        console.log('tmpAddressList',tmpAddressList)
         this.allUserInfo = []
-        for(let i=0;i<this.addressList.length;i++){
-            let userDetail = await this.getUserDetail(this.addressList[i])
+        this.addressList = []
+        for(let i=0;i<tmpAddressList.length;i++){
+            if(tmpAddressList[i]=='0x0000000000000000000000000000000000000000') break;
+            this.addressList.push(tmpAddressList[i])
+            let userDetail = await this.getUserDetail(tmpAddressList[i])
             let usdtAmount = 0
             for(let j=0;j<userDetail.orders.length;j++){
               usdtAmount += userDetail.orders[j].usdtAmount/1e18
             }
-            let teamMemberCount = await this.queryTeamMemberCount(this.addressList[i]);
-            let teamUsdtAmount = await this.queryTeamUsdtAmount(this.addressList[i]);
-            this.allUserInfo.push({info:userDetail,usdtAmount:usdtAmount,address:this.addressList[i],
+            let teamMemberCount = await this.queryTeamMemberCount(tmpAddressList[i]);
+            let teamUsdtAmount = await this.queryTeamUsdtAmount(tmpAddressList[i]);
+            this.allUserInfo.push({info:userDetail,usdtAmount:usdtAmount,address:tmpAddressList[i],
               teamMemberCount:teamMemberCount, teamUsdtAmount:teamUsdtAmount})
             console.log('userDetail',this.allUserInfo[i])
         }
         console.log('this.allUserInfo', this.allUserInfo.length, this.releasedBalance)
+        
+        
+        let usdtBalance = await this.getUsdtBalance('pair')
+        let unmsBalance = await this.getUnmsBalance('pair')
+        this.unmsPrice = (usdtBalance/unmsBalance).toFixed(7)
+        
+        console.log('price', usdtBalance, unmsBalance, this.unmsPrice)
     },
       methods:{
             //会员等级
@@ -144,8 +154,9 @@
                 }
                 return result
             },
-            releaseMyToken(){
-              this.releaseToken(this.withdrawAmount)
+            setPrice(){
+              if(!this.todayPrice||this.todayPrice==''||this.todayPrice/1==0) return
+              this.setTodayPrice(this.todayPrice*1e18)
             },
             async getUserLevelRate(){
               console.log('getUserLevelRate', this.queryAddress)

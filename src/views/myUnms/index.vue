@@ -29,11 +29,11 @@
               <li class="bg-card-bold">
                   <div class="div left">
                     <div class="top1">{{ teamUsdt }} USDT</div>
-                    <div class="top2">{{ $tc('home.CommunityPerformance')}}</div>
+                    <div class="top2">{{ $tc('home.achievement')}}</div>
                   </div>
                   <div class="div right">
                     <div class="top1">{{ teamMemberCount }}</div>
-                    <div class="top2">{{ $tc('home.CommunitySize')}}</div>
+                    <div class="top2">{{ $tc('home.community')}}</div>
                   </div>
               </li>
               <!-- <li class="bg-card-li">
@@ -53,32 +53,44 @@
             <li class="bg-card-bold">
                   <div class="div left">
                     <div class="top1">{{  userinfo.zhituiBonusAmount | fixedValue }} UNMS</div>
-                    <div class="top2">{{ $tc('home.DirectReferrals') }}</div>
+                    <div class="top2">
+                      <!-- {{ $tc('home.DirectReferrals') }} -->
+                      U
+                    </div>
                   </div>
                   <div class="div right">
                     <div class="top1">{{ userinfo.jintuiBonusAmount | fixedValue }} UNMS</div>
-                    <div class="top2">{{ $tc('home.IndirectRecommendation') }}</div>
+                    <div class="top2">
+                      <!-- {{ $tc('home.IndirectRecommendation') }} -->
+                      N
+                    </div>
                   </div>
               </li>
               <li class="bg-card-bold">
                   <div class="div left">
                     <div class="top1">{{ userinfo.gedaiBonusAmount | fixedValue }} UNMS</div>
-                    <div class="top2">{{ $tc('home.Intergenerationalrecommendation') }}</div>
+                    <div class="top2">
+                      <!-- {{ $tc('home.Intergenerationalrecommendation') }} -->
+                      M
+                    </div>
                   </div>
                   <div class="div right">
                     <div class="top1">{{  userinfo.jiedianBonusAmount | fixedValue }} UNMS</div>
-                    <div class="top2">{{ $tc('home.Node') }}</div>
+                    <div class="top2">
+                      S
+                      <!-- {{ $tc('home.Node') }} -->
+                    </div>
                   </div>
               </li>
           </ul>
           <div class="bg-tip">{{ $tc('home.earnings') }}</div>
           <ul class="bg-card">
             <div class="bg-card-tip1">
-                <div class="bg-card-tip1-title">{{ $tc('home.promotion') }} {{ (userinfo.inviteBonusAmount/1 - userinfo.claimedInviteBonusAmount/1) | fixedValue }} UNMS</div>
+                <div class="bg-card-tip1-title">{{ $tc('home.Marketing') }} {{ (userinfo.inviteBonusAmount/1 - userinfo.claimedInviteBonusAmount/1) | fixedValue }} UNMS</div>
                 <div class="bg-card-tip1-btn" @click="claimMint2">{{ $tc('home.DrawDown') }}</div>
             </div>
             <div class="bg-card-tip1">
-                <div class="bg-card-tip1-title">{{ $tc('home.output') }} {{ generate.avaliableAmount | fixedValue }} UNMS</div>
+                <div class="bg-card-tip1-title">{{ $tc('home.personal') }} {{ generate.avaliableAmount | fixedValue }} UNMS</div>
                 <div class="bg-card-tip1-btn" @click="claimMint">{{ $tc('home.DrawDown') }}</div>
             </div>
             <li class="bg-card-bold">
@@ -98,7 +110,7 @@
                   </div>
                   <div class="div right">
                     <div class="top1">{{ userinfo.inviteBonusAmount | fixedValue }} UNMS</div>
-                    <div class="top2">{{ $tc('home.SumRewards') }}</div>
+                    <div class="top2">{{ $tc('home.Marketingsum') }}</div>
                   </div>
               </li>
           </ul>

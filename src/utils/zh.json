@@ -70,8 +70,12 @@
     "replicatedData":"已复制",
     "Salesvolumetoday":"今日销售量",
     "sold":"已销售量",
-    "surplus":"剩余量"
-
+    "surplus":"剩余量",
+    "achievement":"成果",
+    "community":"社区",
+    "Marketingsum":"营销总和",
+    "personal":"个人",
+    "Marketing":"营销"
 
   }
 }

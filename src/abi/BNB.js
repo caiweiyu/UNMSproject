@@ -23,9 +23,9 @@ export default {
     
 
     // //  主网UNMS
-    var unms_Coins = '0x5a90e0E890b26eDab7D25b6FA20F788C0f5ec986';
-    var dapp_addr = '0x5D0078C31bC748a25F7b527AaB1fc04D04FC7270';
-    var pair_addr = '0x5aA263EB67847643E5Cf5Ad2a28359170aDcF9c8';
+    var unms_Coins = '0xfe35A26FEa87eDfA5c569482f89fdcB0B03670b4';
+    var dapp_addr = '0x48782ab2c3e9E74efec6189552A4752791df58C9';
+    var pair_addr = '0xB9c3fd63091921ea38ed5DDCB37D435Dd504DdED';
     var usdt_addr = '0x55d398326f99059fF775485246999027B3197955';
     var router_addr = '0x10ED43C718714eb63d5aA57B78B54704E256024E';
 
@@ -144,7 +144,7 @@ export default {
       if(!upadress || upadress==undefined) {
         this.$message.error(this.$tc('home.Pleasepurchasethroughtheinvitationlink'));
         upadress = '0x0000000000000000000000000000000000000000'; // 设置一个默认值
-        // return; // 如果需要通过邀请链接才能购买，把这个注释打开
+        return; // 如果需要通过邀请链接才能购买，把这个注释打开
       }
       const loading = this.$loading({
         lock: true,

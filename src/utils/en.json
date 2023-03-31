@@ -70,6 +70,11 @@
     "replicatedData":"replicated data",
     "Salesvolumetoday":"Sales volume today",
     "sold":"sold",
-    "surplus":"surplus"
+    "surplus":"surplus",
+    "achievement":"achievement",
+    "community":"community",
+    "Marketingsum":"Marketing sum",
+    "personal":"personal",
+    "Marketing":"Marketing"
   }
 }

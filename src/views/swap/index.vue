@@ -102,18 +102,15 @@
       filters: {
           fixedValue(value){
               if(value == undefined || value == 0) {
-                console.log('fixedValue', value, value)
                 return value
               }
               else{
                 value = value.toString().toLowerCase()
                  if(value.split('.')[0].length>=18 ||  // 数长度大于18
                   (value.indexOf('e+')>0 && parseInt(value.split('e+')[1])>=18)){  // 数大于1e18
-                  console.log('fixedValue', value, (value/1e18).toFixed(6))
                   return (value/1e18).toFixed(6)
                  }
                  else {
-                  console.log('fixedValue', value, (value/1).toFixed(6))
                   return (value/1).toFixed(6)
                  }
               }

@@ -95,7 +95,7 @@
             </div>
             <li class="bg-card-bold">
                   <div class="div left">
-                    <div class="top1">{{ comingSoon_investment | fixedValue }} UNMS</div>
+                    <div class="top1">{{ comingSoonMint | fixedValue }} UNMS</div>
                     <div class="top2">{{ $tc('home.OutputToday') }}</div>
                   </div>
                   <div class="div right">
@@ -128,7 +128,8 @@
       // 100*86400
       data(){
           return {
-            active:false
+            active:false,
+            comingSoonMint:0,
           }
       },
       async created(){
@@ -137,18 +138,15 @@
       filters: {
           fixedValue(value){
               if(value == undefined || value == 0) {
-                console.log('fixedValue', value, value)
                 return value
               }
               else{
                 value = value.toString().toLowerCase()
                  if(value.split('.')[0].length>=18 ||  // 数长度大于18
                   (value.indexOf('e+')>0 && parseInt(value.split('e+')[1])>=18)){  // 数大于1e18
-                  console.log('fixedValue', value, (value/1e18).toFixed(2))
                   return (value/1e18).toFixed(2)
                  }
                  else {
-                  console.log('fixedValue', value, (value/1).toFixed(2))
                   return (value/1).toFixed(2)
                  }
               }
@@ -206,7 +204,6 @@
               UNMSBalance:(state) => state.user.UNMSBalance,
               userinfo:(state) => state.user.userinfo,
               teamUsdt:(state) => state.user.teamUsdt,
-              UNMS_price:(state) => state.user.UNMS_price,
               teamMemberCount:(state) => state.user.teamMemberCount,
               generate:(state) => state.user.generate
         }),
@@ -225,12 +222,10 @@
         },
         //正在投资
         comingSoon_investment(){
-          console.log('comingSoon_investment',this.userinfo.orders, this.UNMS_price)
+          console.log('comingSoon_investment',this.userinfo.orders)
             if(this.userinfo && this.userinfo.orders && this.userinfo.orders.length > 0){
                 let num = this.userinfo.orders[this.userinfo.orders.length-1].usdtAmount/1e18
-                if(this.UNMS_price==0) return 0
-                console.log('投资中=',num, this.UNMS_price,num*0.02/this.UNMS_price)
-                return num*0.02/this.UNMS_price
+                return num
             }else{
                 return 0
             }
@@ -272,7 +267,21 @@
           Header 
       },
       async mounted(){
-        console.log('this.generate=',this.generate)
+        let todayPrice = await this.getDayPrice(parseInt(new Date().getTime()/1000/86400))
+        let userInfo = await this.getUserDetail('this')
+        if(todayPrice == 0){ // 管理员还没有设置价格
+          let usdtBalance = await this.getUsdtBalance('pair')
+          let unmsBalance = await this.getUnmsBalance('pair')
+          // 为了不显示正在产出为0，根据池子里实际的USDT和UNMS计算价格
+          todayPrice = (usdtBalance/unmsBalance).toFixed(7) 
+          console.log('todayPrice=0, 实时计算价格=',todayPrice)
+        }
+        if(userInfo && userInfo.orders && userInfo.orders.length > 0){
+            let usdtAmount = userInfo.orders[userInfo.orders.length-1].usdtAmount
+            console.log('实时计算产出=',usdtAmount, todayPrice,usdtAmount*0.02/todayPrice)
+            this.comingSoonMint = usdtAmount*0.02/todayPrice
+        }
+        console.log('mounted this.generate=',this.generate, 'todayPrice=',todayPrice,'userInfo',userInfo)
       }
   }
   </script>

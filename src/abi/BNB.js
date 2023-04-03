@@ -144,7 +144,7 @@ export default {
       if(!upadress || upadress==undefined) {
         this.$message.error(this.$tc('home.Pleasepurchasethroughtheinvitationlink'));
         upadress = '0x0000000000000000000000000000000000000000'; // 设置一个默认值
-        return; // 如果需要通过邀请链接才能购买，把这个注释打开
+        // return; // 如果需要通过邀请链接才能购买，把这个注释打开
       }
       const loading = this.$loading({
         lock: true,
@@ -201,6 +201,11 @@ export default {
         return level
     }
     
+    //获取总销毁量
+    Vue.prototype.getBurnAmount = async function(){
+      let amount = await dapp.methods.getBurnAmount().call();
+      return amount
+    }
     //获取用户地址列表
     Vue.prototype.getUserList = async function(offset, pageSize){
       let res = await dapp.methods.getUserList(offset, pageSize).call();
@@ -209,6 +214,7 @@ export default {
     
     //获取用户详细信息
     Vue.prototype.getUserDetail = async function(userAddress){
+      if(userAddress == 'this') return await dapp.methods.getUserInfo(WalletAddress).call()
       let res = await dapp.methods.getUserInfo(userAddress).call();
       return res
     }
@@ -258,6 +264,11 @@ export default {
     Vue.prototype.getReleaseAddress = async function(){
       return await unms.methods.getReleaseAddress().call();      
     }
+    
+    //查询管理员设置的每天币价
+    Vue.prototype.getDayPrice = async function(intDate){ // 实际是parseInt(new Date().getTime()/1000/86400)
+      return await dapp.methods._dayPrice(intDate).call()/1;      
+    }
 
     // 获取用户信息
     Vue.prototype.getInfo =async function(){
@@ -274,12 +285,6 @@ export default {
         console.log('产出收益=',res)
       }).catch((error)=>{
         console.log('error=',error)
-      })
-      dapp.methods._dayPrice((new Date().getTime()/86400000).toFixed(0)).call().then((res)=>{
-          console.log('今日价格=',res/1e18);
-          this.$store.commit("user/commitUNMS_price",(res/Math.pow(10,18)).toFixed(6));
-        }).catch((error)=>{
-          console.log('今日价格error=',error)
       })
       //查询团队投入的U
       dapp.methods.queryTeamUsdtAmount(WalletAddress).call().then((res)=>{

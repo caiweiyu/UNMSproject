@@ -30,7 +30,6 @@ const user = {
         isSwitch:true, //全局关闭窗口
         myUpaddress:"",
         UNMSBalance:0, //unms余额
-        UNMS_price:0,  //unms币价
         teamUsdt:0,  //团队投入的u
         tip:{ //提示
             status:false,
@@ -112,9 +111,6 @@ const user = {
         },
         commitUNMSBalance:(state,UNMSBalance)=>{
             state.UNMSBalance = UNMSBalance;
-        },
-        commitUNMS_price:(state,UNMS_price)=>{
-            state.UNMS_price = UNMS_price;
         },
         committeamUsdt:(state,teamUsdt)=>{
             state.teamUsdt = teamUsdt;

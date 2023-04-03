@@ -1,7 +1,7 @@
 <template>
     <div class="box1">
       <Header :title="$tc('home.onSaleUNMS')"></Header>
-      <div class="bg">
+      <div class="bg" v-if="getTodayLimitAmount/1>0">
           <ul class="bg-card">
               <li class="bg-card-li">
                   <div class="left">{{ $tc(`home.Salesvolumetoday`) }}</div>
@@ -27,6 +27,32 @@
               </li>
           </ul>
       </div>
+      <div class="bg" v-else>
+          <ul class="bg-card">
+              <li class="bg-card-li">
+                  <div class="left">{{ $tc(`home.Salesvolumetoday`) }}</div>
+                  <div class="right">{{ realtimeBuyLimitAmount }} UNMS</div>
+              </li>
+              <li class="bg-card-li">
+                  <div class="left">{{ $tc('home.sold')}}</div>
+                  <div class="right">{{ 0 }} UNMS</div>
+              </li>
+              <li class="bg-card-li">
+                  <div class="left">{{ $tc('home.surplus') }}</div>
+                  <div class="right">{{ realtimeBuyLimitAmount }} UNMS</div>
+              </li>
+              <li class="">
+                <div class="left">{{ $tc('home.CurrentCurrency') }}</div>
+                <div class="right"></div>
+              </li>
+              <li class="jj">
+                1 UNMS = {{ unmsPrice }} USDT
+              </li>
+              <li class="jj2">
+                {{ $tc('home.remark') }}
+              </li>
+          </ul>
+      </div>
     </div>
   </template>
   
@@ -37,7 +63,9 @@
       name:"onSale",
       data(){
           return {
-            unmsPrice:'-'
+            unmsPrice:'-',
+            burnAmount:0,
+            realtimeBuyLimitAmount:0,
           }
       },
       methods:{
@@ -47,20 +75,20 @@
         this.LinkBNB()
       },
       async mounted(){
-        // 池子地址0x49F35a6A1e7770B98C69f6BA36F150c0f1a1A2dF
+        // 根据池子里实际的USDT和UNMS计算价格
         let usdtBalance = await this.getUsdtBalance('pair')
         let unmsBalance = await this.getUnmsBalance('pair')
-        this.unmsPrice = (usdtBalance/unmsBalance).toFixed(7)
+        this.unmsPrice = (usdtBalance/unmsBalance).toFixed(7)  
+        this.realtimeBuyLimitAmount = (await this.getBurnAmount()/5e19).toFixed(2)    // 实时计算限购数量
+        // 今日限购数量
       },    
       components:{
           Header 
       },
       computed:{
         ...mapState({
-            UNMS_price:(state) => state.user.UNMS_price,
-            UNMSBalance:(state) => state.user.UNMSBalance,
             userinfo:(state) => state.user.userinfo,
-            getTodayLimitAmount:(state) => state.user.getTodayLimitAmount,
+            getTodayLimitAmount:(state) => state.user.getTodayLimitAmount, // 如果8点以后没有任何人买，这个值为0，需要实时计算
             daySoldAmount:(state) => state.user.daySoldAmount,
         }),
         //总投资额

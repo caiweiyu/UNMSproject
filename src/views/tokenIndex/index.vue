@@ -106,12 +106,12 @@ export default {
                 {name:this.$tc(`home.gonggao`),router:"announcement"},
                 {name:this.$tc(`home.about`),router:"aboutPage"},
                 {name:this.$tc(`home.myUNMS`),router:"myUnms"},
-                {name:this.$tc(`home.onSaleUNMS`),router:"onSale"},
+                // {name:this.$tc(`home.onSaleUNMS`),router:"onSale"},
                 {name:this.$tc(`home.Directpushlist`),router:"transductive"},
                 {name:this.$tc(`home.myInvitation`),router:"invite"},
                 {name:this.$tc(`home.OneclickCoin`),router:""},
                 {name:this.$tc(`home.Tools`),router:""},
-                {name:this.$tc(`home.Swap`),router:"swap"},
+                // {name:this.$tc(`home.Swap`),router:"swap"},
                 {name:this.$tc(`home.DAO`),router:""},
             ],
             msg:""
@@ -252,8 +252,9 @@ export default {
     position: relative;
   }
   .active{
+    height: pxttrem(860) !important;
     // height: pxttrem(948) !important;
-    height: pxttrem(1036) !important;
+    // height: pxttrem(1036) !important;
     // overflow: none !important;
     // overflow: auto !important;
     z-index: 999 !important;

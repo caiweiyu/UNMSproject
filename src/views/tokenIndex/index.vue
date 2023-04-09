@@ -428,6 +428,7 @@ export default {
         cursor: pointer;
     }
   .address{
+    color: #FFFFFF;
     font-size: pxttrem(28);
   }
   .info{

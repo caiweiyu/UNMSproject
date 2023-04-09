@@ -12,7 +12,7 @@ const user = {
         getTickets:0,
         balances:0,
         cbbbalance:0,
-        address:null,
+        address:"",
         buyNumber:0,
         bnbBalance:0,  //bnb余额
         usdtBalance:0,  //usdt余额

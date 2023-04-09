@@ -86,12 +86,12 @@
           <div class="bg-tip">{{ $tc('home.earnings') }}</div>
           <ul class="bg-card">
             <div class="bg-card-tip1">
-                <div class="bg-card-tip1-title">{{ $tc('home.Marketing') }} {{ (userinfo.inviteBonusAmount/1 - userinfo.claimedInviteBonusAmount/1) | fixedValue }} UNMS</div>
-                <div class="bg-card-tip1-btn" @click="claimMint2">{{ $tc('home.DrawDown') }}</div>
-            </div>
-            <div class="bg-card-tip1">
                 <div class="bg-card-tip1-title">{{ $tc('home.personal') }} {{ generate.avaliableAmount | fixedValue }} UNMS</div>
                 <div class="bg-card-tip1-btn" @click="claimMint">{{ $tc('home.DrawDown') }}</div>
+            </div>
+            <div class="bg-card-tip1">
+                <div class="bg-card-tip1-title">{{ $tc('home.Marketing') }} {{ (userinfo.inviteBonusAmount/1 - userinfo.claimedInviteBonusAmount/1) | fixedValue }} UNMS</div>
+                <div class="bg-card-tip1-btn" @click="claimMint2">{{ $tc('home.Basicclaim') }}</div>
             </div>
             <li class="bg-card-bold">
                   <div class="div left">
@@ -99,7 +99,7 @@
                     <div class="top2">{{ $tc('home.OutputToday') }}</div>
                   </div>
                   <div class="div right">
-                    <div class="top1">{{ generate.mintToken | fixedValue }} UNMS</div>
+                    <div class="top1">{{ (generate.mintToken/1>0?generate.mintToken:realtimeMintToken) | fixedValue }} UNMS</div>
                     <div class="top2">{{ $tc('home.CurrentOutput') }}</div>
                   </div>
               </li>
@@ -110,6 +110,21 @@
                   </div>
                   <div class="div right">
                     <div class="top1">{{ userinfo.inviteBonusAmount | fixedValue }} UNMS</div>
+                    <div class="top2">{{ $tc('home.Marketingsum') }}</div>
+                  </div>
+              </li>
+              <div class="line-border"></div>
+              <div class="bg-card-tip1">
+                  <div class="bg-card-tip1-title">{{ $tc('home.Marketing') }} xxx UNMS</div>
+                  <div class="bg-card-tip1-btn" @click="claimMint2">{{ $tc('home.Advancedclaim') }}</div>
+              </div>
+              <li class="bg-card-bold">
+                  <div class="div left">
+                    <div class="top1">000 UNMS</div>
+                    <div class="top2">{{ $tc('home.SumReceived') }}</div>
+                  </div>
+                  <div class="div right">
+                    <div class="top1">000 UNMS</div>
                     <div class="top2">{{ $tc('home.Marketingsum') }}</div>
                   </div>
               </li>
@@ -130,6 +145,7 @@
           return {
             active:false,
             comingSoonMint:0,
+            realtimeMintToken:0
           }
       },
       async created(){
@@ -267,9 +283,10 @@
           Header 
       },
       async mounted(){
-        let todayPrice = await this.getDayPrice(parseInt(new Date().getTime()/1000/86400))
+        let tmpTodayPrice = await this.getDayPrice(parseInt(new Date().getTime()/1000/86400))
+        let todayPrice = tmpTodayPrice
         let userInfo = await this.getUserDetail('this')
-        if(todayPrice == 0){ // 管理员还没有设置价格
+        if(tmpTodayPrice == 0){ // 管理员还没有设置价格
           let usdtBalance = await this.getUsdtBalance('pair')
           let unmsBalance = await this.getUnmsBalance('pair')
           // 为了不显示正在产出为0，根据池子里实际的USDT和UNMS计算价格
@@ -280,8 +297,26 @@
             let usdtAmount = userInfo.orders[userInfo.orders.length-1].usdtAmount
             console.log('实时计算产出=',usdtAmount, todayPrice,usdtAmount*0.02/todayPrice)
             this.comingSoonMint = usdtAmount*0.02/todayPrice
+
+            if(tmpTodayPrice == 0){
+              let order = userInfo.orders[userInfo.orders.length-1];
+              let dayCount = parseInt((parseInt(new Date().getTime()/1000)-order.investTime)/86400);
+              if(dayCount>=100) {
+                  dayCount = 100; 
+              }
+              dayCount -= order.claimDayCount; // 可以领的天数=订单有效天数-领过的天数
+              let today = parseInt(new Date().getTime()/86400000);  
+              let avaliableAmount = order.usdtAmount/50/todayPrice   
+              for(let i=1;i<dayCount;++i){
+                  avaliableAmount += order.usdtAmount*1e18/50/(await this.getDayPrice(today-i)); // 2%U对应的UNMS个数，以某天的价格计算某天的收益
+              }
+              this.realtimeMintToken = avaliableAmount + (order.claimedAmount/1)
+            }
         }
-        console.log('mounted this.generate=',this.generate, 'todayPrice=',todayPrice,'userInfo',userInfo)
+
+        
+
+        console.log('mounted this.generate=',this.generate, 'todayPrice=',todayPrice,'this.realtimeMintToken',this.realtimeMintToken, 'userInfo',userInfo)
       }
   }
   </script>
@@ -295,6 +330,13 @@
     .box1{
       // height: 100vh;
       background: rgba(3, 14, 33, 1);
+          .line-border{
+            height: pxttrem(2);
+            width: pxttrem(400);
+            background: #FFFFFF;
+            opacity: 0.08;
+            margin: pxttrem(20) auto 0;
+          }
           .bg{
               z-index: 10;
               min-height: calc(100vh - 2.56873rem);

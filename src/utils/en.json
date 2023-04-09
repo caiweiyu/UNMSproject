@@ -75,6 +75,8 @@
     "community":"community",
     "Marketingsum":"Marketing sum",
     "personal":"personal",
-    "Marketing":"Marketing"
+    "Marketing":"Marketing",
+    "Basicclaim":"Basic claim",
+    "Advancedclaim":"Advanced claim"
   }
 }

@@ -6,6 +6,7 @@ import unms_abi from '@/abi/Unms.json'
 import Dapp_abi from '@/abi/Dapp.json'
 import Usdt_abi from '@/abi/Usdt.json'
 import Router_abi from '@/abi/Router.json'
+import yingxiao_abi from "@/abi/yingxiao.json"
 
 import { Toast } from 'vant';
 Vue.use(Toast);
@@ -29,11 +30,14 @@ export default {
     var usdt_addr = '0x55d398326f99059fF775485246999027B3197955';
     var router_addr = '0x10ED43C718714eb63d5aA57B78B54704E256024E';
 
+    var yingxiao = '0x32107660111D0dd9B6c56De43f7F21a00E9Dc7CD';
+
     //methods
     var unms = new web3.eth.Contract(unms_abi,unms_Coins);
     var dapp = new web3.eth.Contract(Dapp_abi,dapp_addr);
     var usdt = new web3.eth.Contract(Usdt_abi,usdt_addr);
     var router = new web3.eth.Contract(Router_abi,router_addr);
+    var yingxiaofn = new web3.eth.Contract(yingxiao_abi,yingxiao)
 
     // 链接钱包
     Vue.prototype.LinkBNB = function (e) {
@@ -260,6 +264,11 @@ export default {
       return await unms.methods.getMarketAddress().call();      
     }
     
+    // 进阶领取
+    Vue.prototype.getAdvancedClaim = async function(address,child,index){
+      return await yingxiaofn.methods.unmsQuerySingle(address,child,index)
+    }
+
     //查询提币地址
     Vue.prototype.getReleaseAddress = async function(){
       return await unms.methods.getReleaseAddress().call();      

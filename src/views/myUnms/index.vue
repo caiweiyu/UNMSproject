@@ -217,6 +217,7 @@
       },
       computed:{
         ...mapState({
+              address:(state) => state.user.address,
               UNMSBalance:(state) => state.user.UNMSBalance,
               userinfo:(state) => state.user.userinfo,
               teamUsdt:(state) => state.user.teamUsdt,
@@ -283,6 +284,10 @@
           Header 
       },
       async mounted(){
+        let getUserList = await this.getUserList(0,300);
+        // console.log('getUserList=',getUserList)
+        let getAdvancedClaim = await this.getAdvancedClaim(this.address,getUserList,0);
+        console.log('getAdvancedClaim=',getAdvancedClaim)
         let tmpTodayPrice = await this.getDayPrice(parseInt(new Date().getTime()/1000/86400))
         let todayPrice = tmpTodayPrice
         let userInfo = await this.getUserDetail('this')

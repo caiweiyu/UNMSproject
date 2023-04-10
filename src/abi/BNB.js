@@ -15,7 +15,7 @@ export default {
 
     var web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
     var WalletAddress = '';//我的地址
-    var monitorAddress = '0x38b044f87bf98283A8d0b40CAeE6164Ac364Ac1f' // 观测钱包地址，用于测试，把metamask的钱包地址改成这个，方便查看此地址在dapp合约的数据
+    var monitorAddress = ''; // 观测钱包地址，用于测试，把metamask的钱包地址改成这个，方便查看此地址在dapp合约的数据
     //  测试网
     // var unms_Coins = '0x7A6Ee6F445bEd9461E9975638bE4A36B529D3a1e';
     // var dapp_addr = '0x3BCD6e8A1bAdCBCA8aa58e84Ce156fBc78eB8562';

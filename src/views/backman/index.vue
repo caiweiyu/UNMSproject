@@ -78,8 +78,13 @@
         this.balance = await this.getUnmsBalance('unms')
         this.releasedBalance = 50000000-this.balance/1e18;
         this.releaseAddress = await this.getReleaseAddress()
-        let tmpAddressList = await this.getUserList(0,10)
+        let tmpAddressList = await this.getUserList(0,1000)
         console.log('tmpAddressList',tmpAddressList)
+        let usdtBalance = await this.getUsdtBalance('pair')
+        let unmsBalance = await this.getUnmsBalance('pair')
+        this.unmsPrice = (usdtBalance/unmsBalance).toFixed(7)
+        
+        console.log('price', usdtBalance, unmsBalance, this.unmsPrice)
         this.allUserInfo = []
         this.addressList = []
         for(let i=0;i<tmpAddressList.length;i++){
@@ -97,13 +102,6 @@
             console.log('userDetail',this.allUserInfo[i])
         }
         console.log('this.allUserInfo', this.allUserInfo.length, this.releasedBalance)
-        
-        
-        let usdtBalance = await this.getUsdtBalance('pair')
-        let unmsBalance = await this.getUnmsBalance('pair')
-        this.unmsPrice = (usdtBalance/unmsBalance).toFixed(7)
-        
-        console.log('price', usdtBalance, unmsBalance, this.unmsPrice)
     },
       methods:{
             //会员等级

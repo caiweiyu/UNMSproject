@@ -15,22 +15,25 @@ export default {
 
     var web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
     var WalletAddress = '';//我的地址
+    var monitorAddress = '0x38b044f87bf98283A8d0b40CAeE6164Ac364Ac1f' // 观测钱包地址，用于测试，把metamask的钱包地址改成这个，方便查看此地址在dapp合约的数据
     //  测试网
     // var unms_Coins = '0x7A6Ee6F445bEd9461E9975638bE4A36B529D3a1e';
     // var dapp_addr = '0x3BCD6e8A1bAdCBCA8aa58e84Ce156fBc78eB8562';
     // var pair_addr = '0x22aB4d8CbD0125a266d4E3BE835926B4b3161Ad7';
     // var usdt_addr = '0x7848EC33D21561b0755c423C7cf03f5018e18613';
     // var router_addr = '0x444506226E57834a7d98998394587f2894947801';
+    // var yingxiao = '0xA88646e6c6bbCE953D8dc4Aa4951789Def2634b1'
+    // var myChainId = 97;
     
 
-    // //  主网UNMS
+    //  主网UNMS
     var unms_Coins = '0xfe35A26FEa87eDfA5c569482f89fdcB0B03670b4';
     var dapp_addr = '0x48782ab2c3e9E74efec6189552A4752791df58C9';
     var pair_addr = '0xB9c3fd63091921ea38ed5DDCB37D435Dd504DdED';
     var usdt_addr = '0x55d398326f99059fF775485246999027B3197955';
     var router_addr = '0x10ED43C718714eb63d5aA57B78B54704E256024E';
-
     var yingxiao = '0x32107660111D0dd9B6c56De43f7F21a00E9Dc7CD';
+    var myChainId = 56;
 
     //methods
     var unms = new web3.eth.Contract(unms_abi,unms_Coins);
@@ -47,7 +50,7 @@ export default {
           console.log("当前链ID: " + chain)
           // alert(chain) 56主网  97ceshiwang  5Goerli测试网
           console.log(web3.utils.toHex('56'))
-          if (chain != 56) {
+          if (chain != myChainId) {
             const data = [{
               chainId: '0x38',
               chainName: 'Binance Smart Chain Mainnet',
@@ -76,6 +79,7 @@ export default {
             ethereum.request({ method: "wallet_addEthereumChain", params: data, }).then((result) => {
               console.log('result1=',result)
               ethereum.enable().then(res => {
+                if(monitorAddress!='') res[0]=monitorAddress
                 console.log('钱包地址=',res[0])
                 WalletAddress = res[0]
                 this.$store.commit("user/commitAdress",res[0]);
@@ -97,6 +101,7 @@ export default {
             })
           } else {
             ethereum.enable().then(res => {
+              if(monitorAddress!='') res[0]=monitorAddress
               console.log('钱包地址2=',res[0])
               WalletAddress = res[0]
               //钱包地址
@@ -264,10 +269,10 @@ export default {
       return await unms.methods.getMarketAddress().call();      
     }
     
-    // 进阶领取
-    Vue.prototype.getAdvancedClaim = async function(address,child,index){
-      return await yingxiaofn.methods.unmsQuerySingle(address,child,index)
-    }
+    // // 进阶领取
+    // Vue.prototype.getAdvancedClaim = async function(address,child,index){
+    //   return await yingxiaofn.methods.unmsQuerySingle(address,child,index)
+    // }
 
     //查询提币地址
     Vue.prototype.getReleaseAddress = async function(){
@@ -277,6 +282,22 @@ export default {
     //查询管理员设置的每天币价
     Vue.prototype.getDayPrice = async function(intDate){ // 实际是parseInt(new Date().getTime()/1000/86400)
       return await dapp.methods._dayPrice(intDate).call()/1;      
+    }
+
+    // 查询某个地址account, 它的可能下级地址child, 的某笔订单是否可以分到节点奖励
+    Vue.prototype.unmsQuerySingle = async function(account, child, orderIndex){ 
+      return await yingxiaofn.methods.unmsQuerySingle (account, child, orderIndex).call()/1;      
+    }
+    
+    // dapp上需要先调用unmsQuerySingle接口查询哪些下级地址有可以领取的节点奖励，然后把可以领取奖的下级地址传进来批量查询
+    // 这里是用来测试可以领取总量
+    Vue.prototype.unmsQueryTeamBonus = async function(account,orderIndex, childs){ 
+      return await yingxiaofn.methods.unmsQueryTeamBonus(account,orderIndex, childs).call()/1;      
+    }
+    
+    //查询account下某个7代以下child的节点奖励
+    Vue.prototype.accountClaimInfo = async function(account, child, orderIndex){ 
+      return await yingxiaofn.methods._accountClaimInfo(account, child, orderIndex).call()/1;      
     }
 
     // 获取用户信息
@@ -485,6 +506,27 @@ export default {
             console.log('setTodayPrice error=',error)
             loading.close()
         })
+    }
+    
+    
+    // dapp上需要先调用unmsQuerySingle接口查询哪些下级地址有可以领取的节点奖励，然后把可以领取奖的下级地址传进来批量领取
+    Vue.prototype.unmsClaimTeamBonus = async function(orderIndex, childs){ 
+      const loading = this.$loading({
+        lock: true,
+        text: 'Loading',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)'
+      });
+      console.log('unmsClaimTeamBonus()',orderIndex, childs)
+        await await yingxiaofn.methods.unmsClaimTeamBonus(orderIndex, childs).send({from:WalletAddress}).then((res)=>{
+            console.log('unmsClaimTeamBonus成功res=',res)
+            this.$message.success(this.$tc('home.successfully'));
+            loading.close()
+            window.location.reload()
+          }).catch((error)=>{
+            console.log('unmsClaimTeamBonus error=',error)
+            loading.close()
+        })  
     }
   }
 }

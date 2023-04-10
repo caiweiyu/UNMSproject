@@ -115,19 +115,9 @@
               </li>
               <div class="line-border"></div>
               <div class="bg-card-tip1">
-                  <div class="bg-card-tip1-title">{{ $tc('home.Marketing') }} xxx UNMS</div>
-                  <div class="bg-card-tip1-btn" @click="claimMint2">{{ $tc('home.Advancedclaim') }}</div>
+                  <div class="bg-card-tip1-title">{{ $tc('home.Marketing') }} {{advancedReward|fixedValue}} UNMS</div>
+                  <div class="bg-card-tip1-btn" @click="claimMint3">{{ $tc('home.Advancedclaim') }}</div>
               </div>
-              <li class="bg-card-bold">
-                  <div class="div left">
-                    <div class="top1">000 UNMS</div>
-                    <div class="top2">{{ $tc('home.SumReceived') }}</div>
-                  </div>
-                  <div class="div right">
-                    <div class="top1">000 UNMS</div>
-                    <div class="top2">{{ $tc('home.Marketingsum') }}</div>
-                  </div>
-              </li>
           </ul>
       </div>
     </div>
@@ -145,7 +135,9 @@
           return {
             active:false,
             comingSoonMint:0,
-            realtimeMintToken:0
+            realtimeMintToken:0,
+            advancedReward:0,
+            waitForClaimChilds:[],
           }
       },
       async created(){
@@ -210,6 +202,81 @@
               this.$message.error('可领取数为 0')
             }
         },
+        // 进阶奖励
+        claimMint3(){
+          console.log('claimMint3() advancedReward', this.advancedReward, 'waitForClaimChilds',this.waitForClaimChilds)
+            if(this.advancedReward > 0){
+                this.unmsClaimTeamBonus(0, this.waitForClaimChilds)
+            }else{
+              this.$message.error('可领取数为 0')
+            }
+        },
+        // arr是原数组，N是想分成多少个
+        async fenge(arr, N){
+          var result = [];
+          for (var i = 0; i < arr.length; i += N) {
+            result.push(arr.slice(i, i + N));
+          }
+          return result
+        },
+        // 查询可以领取多少进阶奖励
+        async getReward(){
+            let tmpAddressList = await this.getUserList(1,10000)     
+            let accountList =  new Array();   
+            for(let i=0;i<tmpAddressList.length;i++){
+              if(tmpAddressList[i]=='0x0000000000000000000000000000000000000000'){
+                break;
+              }
+              accountList.push(tmpAddressList[i])
+            }
+               
+            let batchAccountList = await this.fenge(accountList, 20)
+            console.log('原始数组',accountList,'长度',accountList.length,'分割后的数组', batchAccountList)
+            let totalReward=0;
+            for(let i=0;i<batchAccountList.length;i++){
+              totalReward += await this.unmsQueryTeamBonus(this.address,0,batchAccountList[i])/1e18
+              if(totalReward>0 && this.waitForClaimChilds.length==0) this.waitForClaimChilds=batchAccountList[i];
+              console.log('totalReward', totalReward);
+            }
+            this.advancedReward=totalReward
+        },
+        //
+        async init(){
+          let tmpTodayPrice = await this.getDayPrice(parseInt(new Date().getTime()/1000/86400))
+          let todayPrice = tmpTodayPrice
+          let userInfo = await this.getUserDetail('this')
+          if(tmpTodayPrice == 0){ // 管理员还没有设置价格
+            let usdtBalance = await this.getUsdtBalance('pair')
+            let unmsBalance = await this.getUnmsBalance('pair')
+            // 为了不显示正在产出为0，根据池子里实际的USDT和UNMS计算价格
+            todayPrice = (usdtBalance/unmsBalance).toFixed(7) 
+            console.log('todayPrice=0, 实时计算价格=',todayPrice)
+          }
+          if(userInfo && userInfo.orders && userInfo.orders.length > 0){
+              let usdtAmount = userInfo.orders[userInfo.orders.length-1].usdtAmount
+              console.log('实时计算产出=',usdtAmount, todayPrice,usdtAmount*0.02/todayPrice)
+              this.comingSoonMint = usdtAmount*0.02/todayPrice
+
+              if(tmpTodayPrice == 0){
+                let order = userInfo.orders[userInfo.orders.length-1];
+                let dayCount = parseInt((parseInt(new Date().getTime()/1000)-order.investTime)/86400);
+                if(dayCount>=100) {
+                    dayCount = 100; 
+                }
+                dayCount -= order.claimDayCount; // 可以领的天数=订单有效天数-领过的天数
+                let today = parseInt(new Date().getTime()/86400000);  
+                let avaliableAmount = order.usdtAmount/50/todayPrice   
+                for(let i=1;i<dayCount;++i){
+                    avaliableAmount += order.usdtAmount*1e18/50/(await this.getDayPrice(today-i)); // 2%U对应的UNMS个数，以某天的价格计算某天的收益
+                }
+                this.realtimeMintToken = avaliableAmount + (order.claimedAmount/1)
+              }
+          }        
+          console.log('mounted this.generate=',this.generate, 'todayPrice=',todayPrice,'this.realtimeMintToken',this.realtimeMintToken, 'userInfo',userInfo)
+          
+          await this.getReward()
+        },
+
         //展开
         More(){
           this.active = !this.active
@@ -284,44 +351,11 @@
           Header 
       },
       async mounted(){
-        let getUserList = await this.getUserList(0,300);
+        // let getUserList = await this.getUserList(0,300);
         // console.log('getUserList=',getUserList)
-        let getAdvancedClaim = await this.getAdvancedClaim(this.address,getUserList,0);
-        console.log('getAdvancedClaim=',getAdvancedClaim)
-        let tmpTodayPrice = await this.getDayPrice(parseInt(new Date().getTime()/1000/86400))
-        let todayPrice = tmpTodayPrice
-        let userInfo = await this.getUserDetail('this')
-        if(tmpTodayPrice == 0){ // 管理员还没有设置价格
-          let usdtBalance = await this.getUsdtBalance('pair')
-          let unmsBalance = await this.getUnmsBalance('pair')
-          // 为了不显示正在产出为0，根据池子里实际的USDT和UNMS计算价格
-          todayPrice = (usdtBalance/unmsBalance).toFixed(7) 
-          console.log('todayPrice=0, 实时计算价格=',todayPrice)
-        }
-        if(userInfo && userInfo.orders && userInfo.orders.length > 0){
-            let usdtAmount = userInfo.orders[userInfo.orders.length-1].usdtAmount
-            console.log('实时计算产出=',usdtAmount, todayPrice,usdtAmount*0.02/todayPrice)
-            this.comingSoonMint = usdtAmount*0.02/todayPrice
-
-            if(tmpTodayPrice == 0){
-              let order = userInfo.orders[userInfo.orders.length-1];
-              let dayCount = parseInt((parseInt(new Date().getTime()/1000)-order.investTime)/86400);
-              if(dayCount>=100) {
-                  dayCount = 100; 
-              }
-              dayCount -= order.claimDayCount; // 可以领的天数=订单有效天数-领过的天数
-              let today = parseInt(new Date().getTime()/86400000);  
-              let avaliableAmount = order.usdtAmount/50/todayPrice   
-              for(let i=1;i<dayCount;++i){
-                  avaliableAmount += order.usdtAmount*1e18/50/(await this.getDayPrice(today-i)); // 2%U对应的UNMS个数，以某天的价格计算某天的收益
-              }
-              this.realtimeMintToken = avaliableAmount + (order.claimedAmount/1)
-            }
-        }
-
-        
-
-        console.log('mounted this.generate=',this.generate, 'todayPrice=',todayPrice,'this.realtimeMintToken',this.realtimeMintToken, 'userInfo',userInfo)
+        // let getAdvancedClaim = await this.getAdvancedClaim(this.address,getUserList,0);
+        // console.log('getAdvancedClaim=',getAdvancedClaim)
+        setTimeout(this.init, 1000);
       }
   }
   </script>

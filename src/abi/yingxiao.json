@@ -1,8 +1,51 @@
 [
     {
-        "inputs": [],
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "dapp",
+                "type": "address"
+            }
+        ],
         "stateMutability": "nonpayable",
         "type": "constructor"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "child",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "bonus",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint8",
+                "name": "maxLevelRate",
+                "type": "uint8"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint8",
+                "name": "v5Count",
+                "type": "uint8"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "dai",
+                "type": "uint256"
+            }
+        ],
+        "name": "BonusInfo",
+        "type": "event"
     },
     {
         "anonymous": false,
@@ -26,12 +69,22 @@
     {
         "inputs": [
             {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            },
+            {
                 "internalType": "uint32",
                 "name": "",
                 "type": "uint32"
             }
         ],
-        "name": "_dayPrice",
+        "name": "_accountClaimInfo",
         "outputs": [
             {
                 "internalType": "uint256",
@@ -44,50 +97,21 @@
     },
     {
         "inputs": [],
-        "name": "getBurnAmount",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "getMarketAddress",
+        "name": "getParams",
         "outputs": [
             {
                 "internalType": "address",
-                "name": "",
+                "name": "dapp",
                 "type": "address"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "getTotalInvestAmount",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "getUnmsTokenContractAddress",
-        "outputs": [
+            },
             {
                 "internalType": "address",
-                "name": "",
+                "name": "unms",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "topAddress",
                 "type": "address"
             }
         ],
@@ -100,166 +124,34 @@
                 "internalType": "address",
                 "name": "userAddress",
                 "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "orderIndex",
+                "type": "uint256"
             }
         ],
         "name": "getUserInfo",
         "outputs": [
             {
-                "components": [
-                    {
-                        "internalType": "uint8",
-                        "name": "zhituiRate",
-                        "type": "uint8"
-                    },
-                    {
-                        "internalType": "uint8",
-                        "name": "jintuiRate",
-                        "type": "uint8"
-                    },
-                    {
-                        "internalType": "uint8",
-                        "name": "teamRate",
-                        "type": "uint8"
-                    },
-                    {
-                        "internalType": "uint8",
-                        "name": "levelRate",
-                        "type": "uint8"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "zhituiUsdtAmount",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "jintuiUsdtAmount",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "zhituiBonusAmount",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "jintuiBonusAmount",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "gedaiBonusAmount",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "jiedianBonusAmount",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "inviteBonusAmount",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "claimedInviteBonusAmount",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "address",
-                        "name": "parent",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "address[]",
-                        "name": "invited",
-                        "type": "address[]"
-                    },
-                    {
-                        "components": [
-                            {
-                                "internalType": "bool",
-                                "name": "isClear",
-                                "type": "bool"
-                            },
-                            {
-                                "internalType": "uint32",
-                                "name": "investTime",
-                                "type": "uint32"
-                            },
-                            {
-                                "internalType": "uint32",
-                                "name": "claimDayCount",
-                                "type": "uint32"
-                            },
-                            {
-                                "internalType": "uint256",
-                                "name": "usdtAmount",
-                                "type": "uint256"
-                            },
-                            {
-                                "internalType": "uint256",
-                                "name": "claimedAmount",
-                                "type": "uint256"
-                            }
-                        ],
-                        "internalType": "struct Dapp.Order[]",
-                        "name": "orders",
-                        "type": "tuple[]"
-                    }
-                ],
-                "internalType": "struct Dapp.UserInfo",
-                "name": "",
-                "type": "tuple"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "offset",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "pageSize",
-                "type": "uint256"
-            }
-        ],
-        "name": "getUserList",
-        "outputs": [
-            {
-                "internalType": "address[]",
-                "name": "",
-                "type": "address[]"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
                 "internalType": "address",
-                "name": "userAddress",
+                "name": "parent",
                 "type": "address"
             },
             {
-                "internalType": "address",
-                "name": "parentAddress",
-                "type": "address"
-            }
-        ],
-        "name": "hasCircleParent",
-        "outputs": [
+                "internalType": "uint8",
+                "name": "levelRate",
+                "type": "uint8"
+            },
             {
-                "internalType": "bool",
-                "name": "",
-                "type": "bool"
+                "internalType": "uint256",
+                "name": "usdtAmount",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint32",
+                "name": "investTime",
+                "type": "uint32"
             }
         ],
         "stateMutability": "view",
@@ -279,63 +171,6 @@
         "type": "function"
     },
     {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "userAddress",
-                "type": "address"
-            }
-        ],
-        "name": "queryLevelRate",
-        "outputs": [
-            {
-                "internalType": "uint8",
-                "name": "",
-                "type": "uint8"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "userAddress",
-                "type": "address"
-            }
-        ],
-        "name": "queryTeamMemberCount",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "userAddress",
-                "type": "address"
-            }
-        ],
-        "name": "queryTeamUsdtAmount",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "totalUsdtAmount",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
         "inputs": [],
         "name": "renounceOwnership",
         "outputs": [],
@@ -346,184 +181,28 @@
         "inputs": [
             {
                 "internalType": "address",
-                "name": "addr",
+                "name": "account",
                 "type": "address"
-            }
-        ],
-        "name": "setMarketAddress",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "price",
-                "type": "uint256"
-            }
-        ],
-        "name": "setPrice",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
+            },
             {
                 "internalType": "address",
-                "name": "contractAddress",
+                "name": "child",
                 "type": "address"
-            }
-        ],
-        "name": "setUnmsTokenContractAddress",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "userAddress",
-                "type": "address"
-            },
-            {
-                "internalType": "uint8",
-                "name": "zhituiRate",
-                "type": "uint8"
-            },
-            {
-                "internalType": "uint8",
-                "name": "jintuiRate",
-                "type": "uint8"
-            },
-            {
-                "internalType": "uint8",
-                "name": "teamRate",
-                "type": "uint8"
-            },
-            {
-                "internalType": "uint8",
-                "name": "levelRate",
-                "type": "uint8"
-            }
-        ],
-        "name": "setUnmsUserInfo",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "userAddress",
-                "type": "address"
-            },
-            {
-                "internalType": "uint8",
-                "name": "zhituiRate",
-                "type": "uint8"
-            },
-            {
-                "internalType": "uint8",
-                "name": "jintuiRate",
-                "type": "uint8"
-            },
-            {
-                "internalType": "uint8",
-                "name": "teamRate",
-                "type": "uint8"
-            },
-            {
-                "internalType": "uint8",
-                "name": "levelRate",
-                "type": "uint8"
-            },
-            {
-                "internalType": "uint256",
-                "name": "inviteBonusAmount",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "claimedInviteBonusAmount",
-                "type": "uint256"
-            }
-        ],
-        "name": "testSetUserInfo",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "userAddress",
-                "type": "address"
-            },
-            {
-                "internalType": "address[]",
-                "name": "invited",
-                "type": "address[]"
-            }
-        ],
-        "name": "testSetUserInvited",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "userAddress",
-                "type": "address"
-            },
-            {
-                "internalType": "uint8",
-                "name": "orderIndex",
-                "type": "uint8"
-            },
-            {
-                "internalType": "bool",
-                "name": "isClear",
-                "type": "bool"
             },
             {
                 "internalType": "uint32",
-                "name": "investTime",
+                "name": "orderIndex",
                 "type": "uint32"
             },
             {
                 "internalType": "uint256",
-                "name": "usdtAmount",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "claimedAmount",
+                "name": "claimAmount",
                 "type": "uint256"
             }
         ],
-        "name": "testSetUserOrder",
+        "name": "setAccountInfo",
         "outputs": [],
         "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "tokenDistributor",
-        "outputs": [
-            {
-                "internalType": "contract TokenDistributor",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
         "type": "function"
     },
     {
@@ -540,89 +219,101 @@
         "type": "function"
     },
     {
-        "inputs": [],
-        "name": "unmsClaimInviteBonus",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "unmsClaimMintToken",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
         "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "usdtAmount",
-                "type": "uint256"
-            },
-            {
-                "internalType": "address",
-                "name": "parent",
-                "type": "address"
-            }
-        ],
-        "name": "unmsInputU",
-        "outputs": [
-            {
-                "internalType": "bool",
-                "name": "success",
-                "type": "bool"
-            }
-        ],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "userAddress",
-                "type": "address"
-            }
-        ],
-        "name": "unmsQueryMintToken",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "mintToken",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "avaliableAmount",
-                "type": "uint256"
-            },
             {
                 "internalType": "uint32",
-                "name": "dayCount",
+                "name": "orderIndex",
                 "type": "uint32"
             },
             {
-                "internalType": "bool",
-                "name": "orderExpire",
-                "type": "bool"
+                "internalType": "address[]",
+                "name": "childs",
+                "type": "address[]"
+            }
+        ],
+        "name": "unmsClaimTeamBonus",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "account",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "child",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "orderIndex",
+                "type": "uint256"
+            }
+        ],
+        "name": "unmsQuerySingle",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "totalBonus",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint8",
+                "name": "maxLevelRate",
+                "type": "uint8"
+            },
+            {
+                "internalType": "uint8",
+                "name": "v5Count",
+                "type": "uint8"
+            },
+            {
+                "internalType": "uint256",
+                "name": "dai",
+                "type": "uint256"
             }
         ],
         "stateMutability": "view",
         "type": "function"
     },
     {
-        "inputs": [],
-        "name": "unmsReleaseBalance",
-        "outputs": [],
-        "stateMutability": "nonpayable",
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "account",
+                "type": "address"
+            },
+            {
+                "internalType": "uint32",
+                "name": "orderIndex",
+                "type": "uint32"
+            },
+            {
+                "internalType": "address[]",
+                "name": "childs",
+                "type": "address[]"
+            }
+        ],
+        "name": "unmsQueryTeamBonus",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "totalBonus",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
         "type": "function"
     },
     {
         "inputs": [
             {
                 "internalType": "address",
-                "name": "token",
+                "name": "to",
                 "type": "address"
             },
             {
@@ -635,22 +326,5 @@
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "upgradeLevelRate",
-        "outputs": [
-            {
-                "internalType": "bool",
-                "name": "",
-                "type": "bool"
-            }
-        ],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "stateMutability": "payable",
-        "type": "receive"
     }
 ]
